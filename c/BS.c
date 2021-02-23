@@ -2,7 +2,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include <constants.h>
+#include "constants.h"
 
 void putByte(byte b){ // Help pls
   assert(streamMode == 0);

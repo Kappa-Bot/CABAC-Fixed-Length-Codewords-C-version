@@ -6,21 +6,19 @@ This is a transcription from an implementation of an Arithmetic encoder/decoder 
   - [ ] \(Optional) Manage to externally use Java's ByteStream instances
 ## Evaluation: Java vs C
 ### Streams generator
-  - [ ] On Java
+  - [X] On Java
   - [ ] On C
 ### Functions testing
+  - [X] probToFLW
+  - [X] FLWToProb
   - [ ] transferInterval
   - [ ] fillInterval
 #### Encode
-  - [ ] encodeBit
   - [ ] encodeBitContext
   - [ ] encodeBitProb
-  - [ ] encodeInteger
 #### Decode
-  - [ ] decodeBit
   - [ ] decodeBitContext
   - [ ] decodeBitProb
-  - [ ] decodeInteger
 ### Profiling: I/O + Throughput
   - [ ] on Java
   - [ ] on C
