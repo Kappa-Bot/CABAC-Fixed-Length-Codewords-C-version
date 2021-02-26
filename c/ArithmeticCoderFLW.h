@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "ByteStream.h"
+
 #define UPDATE_PROB0 7;
 #define WINDOW_PROB 127;
 
@@ -29,7 +31,7 @@ struct ACFLW_s {
   int  t;                // Number of bits to transfer
   int  L;                // Current position in the stream
   int  numContexts;      // Number of contexts
-  // ByteStream *stream;    // ByteStream employed by the coder, may contain zero bytes
+  ByteStream *stream;    // ByteStream employed by the coder, may contain zero bytes
 
   int* contextProb0FLW; // Current probability of each contex
   int* context0s;       // Number of 0s coded in this context
@@ -50,7 +52,7 @@ struct ACFLW_s {
   -1,     // t
   -1,     // L
   -1,     // numContexts
-  // NULL,   // stream
+  NULL,   // stream
   NULL,   // contextProb0FLW
   NULL,   // context0s
   NULL,   // context0sWindow
@@ -72,9 +74,22 @@ void ArithmeticCoderFLW_3(ArithmeticCoderFLW *object, int codewordLength, int pr
 int prob0ToFLW(float prob0, int precisionBits);     // Tested
 float FLWToProb0(int prob0FLW, int precisionBits);  // Tested
 
-void reset(ArithmeticCoderFLW *object);
+// void encodeBit(ArithmeticCoderFLW *object, int bit);
+// int decodebit(ArithmeticCoderFLW *object);
+// void encodeBitContext(ArithmeticCoderFLW *object, int bit, int context);
+// int decodeBitContext(ArithmeticCoderFLW *object, int context);
+// void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW);
+// int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW);
+// void encodeInteger(ArithmeticCoderFLW *object, int num, int numBits);
+// int decodeInteger(ArithmeticCoderFLW *object, int numBits);
+// void transferInterval(ArithmeticCoderFLW *object, int length);
+// void fillInterval(ArithmeticCoderFLW *object);
+// void changeStream(ByteStream *stream);
+
+void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);
 void restartEncoding(ArithmeticCoderFLW *object);
 void restartDecoding(ArithmeticCoderFLW *object);
+// void terminate(ArithmeticCoderFLW *object);
 int remainingBytes(ArithmeticCoderFLW *object);
 int getReadBytes(ArithmeticCoderFLW *object);
 void setReplenishment(ArithmeticCoderFLW *object, int replenishment);
@@ -159,7 +174,7 @@ void ArithmeticCoderFLW_3(ArithmeticCoderFLW *object, int codewordLength, int pr
   object->context0s = (int *) malloc(object->numContexts * sizeof(int));
   object->context0sWindow = (int *) malloc(object->numContexts * sizeof(int));
   object->contextTotal = (int *) malloc(object->numContexts * sizeof(int));
-  reset(object);
+  ArithmeticCoderFLW_reset(object);
   restartEncoding(object);
 }
 
@@ -207,7 +222,7 @@ float FLWToProb0(int prob0FLW, int precisionBits) {
 /**
  * Resets the state of all contexts.
  */
-void reset(ArithmeticCoderFLW *object) {
+void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object) {
   for(int c = 0; c < object->numContexts; c++) {
     object->contextProb0FLW[c] = prob0ToFLW(0.66f, object->precisionBits); //Slightly biased towards 0
     object->context0s[c] = 2;

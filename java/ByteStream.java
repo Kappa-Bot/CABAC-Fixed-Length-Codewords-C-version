@@ -646,7 +646,7 @@ public final class ByteStream{
 	 * Frees the memory occupied by this stream. Call this function when this object is no
 	 * longer needed.
 	 */
-	public void destroy(){
+	public void destroy() {
 		buffer = null;
 		readFileChannel = null;
 		readFileSegments = null;
@@ -673,9 +673,9 @@ public final class ByteStream{
 	 *
 	 * @return the number of bytes employed
 	 */
-	public int getMemorySegments(){
+	public int getMemorySegments() {
 		int memory = 0;
-		if(streamMode == 0){
+		if(streamMode == 0) {
 			memory = readFileSegments.length * 2 * (Long.SIZE / 8);
 		}
 		return(memory);

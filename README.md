@@ -11,17 +11,9 @@ This is a transcription from an implementation of an Arithmetic encoder/decoder 
 ### Functions testing
   - [X] probToFLW
   - [X] FLWToProb
-  - [ ] transferInterval
-  - [ ] fillInterval
-#### Encode
-  - [ ] encodeBitContext
-  - [ ] encodeBitProb
-#### Decode
-  - [ ] decodeBitContext
-  - [ ] decodeBitProb
+  - Coming soon ...
 ### Profiling: I/O + Throughput
-  - [ ] on Java
-  - [ ] on C
+  - Coming soon ...
 ## Paralelization
   - [ ] \(Optional) Process-level parallelization (ByteStream instances)
   - [ ] \(Optional) Task-level algorithm parallelization
