@@ -1,4 +1,3 @@
-import streams.ByteStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -17,15 +16,7 @@ public class ACTest {
 
     public static void main(String[] args) throws IOException {
       System.out.println("Initializing ArithmeticCoderFLW");
-      StreamGenerator fileGen = new StreamGenerator(dir, ext);
-      fileGen.generate(512, 1);
-      FileInputStream fis = new FileInputStream(dir + "file_0" + ext);
       ArithmeticCoderFLW AC = new ArithmeticCoderFLW();
-      AC.changeStream(new ByteStream(fis.getChannel()));
-      AC.restartEncoding();
-
-      // TODO: test every function behaviour
-
 
       System.out.println("prob0ToFLW + FLWToProb0 Test");
       for (int i = 0; i < 10; i++) {
@@ -34,30 +25,18 @@ public class ACTest {
 
         for (int j = 0; j < 10; j++) {
           int precisionBits = precisionSet[j];
-          System.out.print("Bits: " + precisionBits);
-
           int expectedFLW = AC.prob0ToFLW(prob0, precisionBits);
-          System.out.print(" -> " + expectedFLW);
-
           float expectedProb = AC.FLWToProb0(expectedFLW, precisionBits);
-          System.out.print(" -> " + expectedProb);
-
           int realFLW = AC.prob0ToFLW(expectedProb, precisionBits);
-          System.out.print(" -> " + realFLW);
-
           float realProb = AC.FLWToProb0(realFLW, precisionBits);
-          System.out.println(" -> " + realProb);
+
+          System.out.print("Bits: " + precisionBits
+                           + " -> " + expectedFLW
+                           + " -> " + expectedProb
+                           + " -> " + realFLW
+                           + " -> " + realProb + "\n");
         }
         System.out.println("---------------------------------------");
       }
-
-      System.out.println("File Stream Test");
-      fileGen.generate(filesize, count);
-      for (int i = 0; i < count; i++) {
-        // TODO: test some stuff for the AC using its BS
-        // FileInputStream fis = new FileInputStream(dir + "file_" + i + ext);
-      }
-
-      System.out.println("Seems like this has finished.");
     }
 }
