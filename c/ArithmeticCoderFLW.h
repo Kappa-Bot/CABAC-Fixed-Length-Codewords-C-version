@@ -8,8 +8,8 @@
 
 #include "ByteStream.h"
 
-#define UPDATE_PROB0 7;
-#define WINDOW_PROB 127;
+#define UPDATE_PROB0 7
+#define WINDOW_PROB 127
 
 const long BIT_MASKS[] = {0x0, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
 const int BIT_MASKS2[] = {1, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, \
@@ -74,22 +74,22 @@ void ArithmeticCoderFLW_3(ArithmeticCoderFLW *object, int codewordLength, int pr
 int prob0ToFLW(float prob0, int precisionBits);     // Tested
 float FLWToProb0(int prob0FLW, int precisionBits);  // Tested
 
-// void encodeBit(ArithmeticCoderFLW *object, int bit);
-// int decodebit(ArithmeticCoderFLW *object);
+void encodeBit(ArithmeticCoderFLW *object, int bit);
+int decodeBit(ArithmeticCoderFLW *object);
 // void encodeBitContext(ArithmeticCoderFLW *object, int bit, int context);
 // int decodeBitContext(ArithmeticCoderFLW *object, int context);
-// void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW);
-// int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW);
-// void encodeInteger(ArithmeticCoderFLW *object, int num, int numBits);
-// int decodeInteger(ArithmeticCoderFLW *object, int numBits);
-// void transferInterval(ArithmeticCoderFLW *object, int length);
-// void fillInterval(ArithmeticCoderFLW *object);
-// void changeStream(ByteStream *stream);
+void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW);
+int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW);
+void encodeInteger(ArithmeticCoderFLW *object, int num, int numBits);
+int decodeInteger(ArithmeticCoderFLW *object, int numBits);
+void transferInterval(ArithmeticCoderFLW *object, int length);
+void fillInterval(ArithmeticCoderFLW *object);
+void changeStream(ArithmeticCoderFLW *object, ByteStream *stream);
 
 void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);
 void restartEncoding(ArithmeticCoderFLW *object);
 void restartDecoding(ArithmeticCoderFLW *object);
-// void terminate(ArithmeticCoderFLW *object);
+void terminate(ArithmeticCoderFLW *object);
 int remainingBytes(ArithmeticCoderFLW *object);
 int getReadBytes(ArithmeticCoderFLW *object);
 void setReplenishment(ArithmeticCoderFLW *object, int replenishment);
@@ -220,6 +220,290 @@ float FLWToProb0(int prob0FLW, int precisionBits) {
 }
 
 /**
+ * Encodes a bit without using any probability model.
+ *
+ * @param bit input
+ */
+void encodeBit(ArithmeticCoderFLW *object, int bit){
+  encodeBitProb(object, bit, object->precisionMid);
+}
+
+/**
+ * Decodes a bit without using any probability model.
+ *
+ * @return bit output
+ * @throws Exception when some problem manipulating the stream occurs
+ */
+int decodeBit(ArithmeticCoderFLW *object) {
+  return(decodeBitProb(object, object->precisionMid));
+}
+
+
+/**
+ * Encodes a bit using a context so that the probabilities are adaptively adjusted
+ * depending on the incoming symbols.
+ *
+ * @param bit input
+ * @param context context of the symbol
+ */
+void encodeBitContext(ArithmeticCoderFLW *object, int bit, int context) {
+	//Updates the probability of this context, when necessary
+	if((object->contextTotal[context] & UPDATE_PROB0) == UPDATE_PROB0) {
+		if(object->context0s[context] == 0) {
+			object->contextProb0FLW[context] = 1;
+		} else if(object->context0s[context] == object->contextTotal[context]) {
+			object->contextProb0FLW[context] = (1 << object->precisionBits) - 1;
+		} else {
+			object->contextProb0FLW[context] = (object->context0s[context] << object->precisionBits) / object->contextTotal[context];
+		}
+		assert((object->contextProb0FLW[context] > 0) && (object->contextProb0FLW[context] < (1 << object->precisionBits)));
+		if((object->contextTotal[context] & WINDOW_PROB) == WINDOW_PROB) {
+			if(object->context0sWindow[context] != -1) {
+				object->contextTotal[context] -= WINDOW_PROB;
+				object->context0s[context] -= object->context0sWindow[context];
+			}
+			object->context0sWindow[context] = object->context0s[context];
+		}
+	}
+
+	//Encodes the bit
+	encodeBitProb(object, bit, object->contextProb0FLW[context]);
+
+	//Updates the number of symbols coded for this context
+	if(bit == 0) {
+		object->context0s[context]++;
+	}
+	object->contextTotal[context]++;
+}
+
+/**
+ * Decodes a bit using a context so that the probabilities are adaptively adjusted
+ * depending on the outcoming symbols.
+ *
+ * @param context context of the symbols
+ * @return output bit
+ * @throws Exception when some problem manipulating the stream occurs
+ */
+int decodeBitContext(ArithmeticCoderFLW *object, int context) {
+	//Updates the probability of this context, when necessary
+	if((object->contextTotal[context] & UPDATE_PROB0) == UPDATE_PROB0) {
+		if(object->context0s[context] == 0) {
+			object->contextProb0FLW[context] = 1;
+		} else if(object->context0s[context] == object->contextTotal[context]) {
+			object->contextProb0FLW[context] = (1 << object->precisionBits) - 1;
+		} else {
+			object->contextProb0FLW[context] = (object->context0s[context] << object->precisionBits) / object->contextTotal[context];
+		}
+		assert((object->contextProb0FLW[context] > 0) && (object->contextProb0FLW[context] < (1 << object->precisionBits)));
+		if((object->contextTotal[context] & WINDOW_PROB) == WINDOW_PROB) {
+			if(object->context0sWindow[context] != -1) {
+				object->contextTotal[context] -= WINDOW_PROB;
+				object->context0s[context] -= object->context0sWindow[context];
+			}
+			object->context0sWindow[context] = object->context0s[context];
+		}
+	}
+
+	//Decodes the bit
+	int bit = decodeBitProb(object, object->contextProb0FLW[context]);
+
+	//Updates the number of symbols coded for this context
+	if(bit == 0) {
+		object->context0s[context]++;
+	}
+	object->contextTotal[context]++;
+	return(bit);
+}
+
+/**
+ * Encodes a bit using a specified probability.
+ *
+ * @param bit input
+ * @param prob0FLW probability of bit == false. This probability is generated via {@link #prob0ToFLW}
+ */
+void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW){
+  assert((prob0FLW > 0) && (prob0FLW < (1 << object->precisionBits)));
+  assert(object->intervalSize >= 1);
+
+  if(bit == 0) {
+    object->intervalSize = ((long) prob0FLW * object->intervalSize) >> object->precisionBits;
+  } else {
+    long tmp = (((long) prob0FLW * object->intervalSize) >> object->precisionBits) + 1;
+    object->intervalMin += tmp;
+    object->intervalSize -= tmp;
+  }
+
+  if(object->intervalSize == 0) {
+    object->interval = object->intervalMin;
+    transferInterval(object, object->codewordLength);
+    object->intervalMin = 0;
+    object->intervalSize = object->codewordMax;
+  }
+}
+
+/**
+ * Decodes a bit using a specified probability.
+ *
+ * @param prob0FLW probability of bit == false. This probability is generated via {@link #prob0ToFLW}
+ * @return bit decoded bit
+ * @throws Exception when some problem manipulating the stream occurs
+ */
+int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW) {
+  assert((prob0FLW > 0) && (prob0FLW < (1 << object->precisionBits)));
+
+  if(object->intervalSize == 0) {
+    fillInterval(object);
+    object->intervalMin = 0;
+    object->intervalSize = object->codewordMax;
+  }
+  assert(object->intervalSize >= 1);
+
+  long tmp = (((long) prob0FLW * object->intervalSize) >> object->precisionBits) + 1;
+  long mid = object->intervalMin + tmp;
+  int bit;
+  if(object->interval >= mid) {
+    bit = 1;
+    object->intervalMin = mid;
+    object->intervalSize -= tmp;
+  } else {
+    bit = 0;
+    object->intervalSize = tmp - 1;
+  }
+  return(bit);
+}
+
+/**
+ * Encodes an integer without using any probability model.
+ *
+ * @param num input
+ * @param numBits number of bits coded for that integer
+ */
+void encodeInteger(ArithmeticCoderFLW *object, int num, int numBits) {
+  assert(num >= 0);
+  assert(num < (1 << (numBits + 1)));
+
+  for(int bit = numBits - 1; bit >= 0; bit--) {
+    int realBit = (num & BIT_MASKS2[bit]) != 0;
+    encodeBit(object, realBit);
+  }
+}
+
+/**
+ * Decodes an integer without using any probability model.
+ *
+ * @param numBits number of bits decoded for that integer
+ * @return output integer
+ * @throws Exception when some problem manipulating the stream occurs
+ */
+int decodeInteger(ArithmeticCoderFLW *object, int numBits) {
+  int num = 0;
+  for(int bit = numBits - 1; bit >= 0; bit--){
+    if(decodeBit(object)) {
+      num += BIT_MASKS2[bit];
+    }
+  }
+  return(num);
+}
+
+/**
+ * Transfers the interval to the stream (for encoding only).
+ *
+ * @param length number of bits of the interval to be transferred
+ */
+void transferInterval(ArithmeticCoderFLW *object, int length) {
+  int transferredBits = 0;
+  while(transferredBits < length) {
+    int remainingBits = object->codewordLength - transferredBits;
+    int transfer = remainingBits <= object->t? remainingBits: object->t;
+
+    if((remainingBits - object->t) >= 0) {
+      object->Tr |= (object->interval >> (remainingBits - object->t)) & BIT_MASKS[transfer];
+    } else {
+      object->Tr |= (object->interval & BIT_MASKS[transfer]) << (object->t - remainingBits);
+    }
+
+    object->t -= transfer;
+    if(object->t == 0) {
+      putByte(object->stream, (unsigned char) object->Tr);
+      if(object->Tr == 0xFF) {
+        object->t = 7;
+      } else {
+        object->t = 8;
+      }
+      object->Tr = 0;
+      object->L++;
+    }
+    assert(object->t >= 0 && object->t <= 8);
+
+    transferredBits += transfer;
+  }
+}
+
+/**
+ * Reads the coded interval from the stream (for decoding only). If at the middle
+ * of reading the interval, the stream runs out of bytes, this function fills the
+ * least significant bits of the codeword with 0s.
+ */
+void fillInterval(ArithmeticCoderFLW *object) {
+  if(!object->replenishment && (object->L >= getLength(object->stream))) {
+    //This placed here to throw the exception only when trying to fill a new interval
+    fprintf(stderr, "No more data in the stream to fill the interval.");
+  }
+
+  int readBits = 0;
+  object->interval = 0;
+  do {
+    if(object->t == 0) {
+      if(object->L < getLength(object->stream)) {
+        if(object->Tr == 0xFF) {
+          object->t = 7;
+        } else {
+          object->t = 8;
+        }
+        object->Tr = (0x000000FF & getByte_1(object->stream, object->L));
+        object->L++;
+      } else {
+        //Fills with 0s
+        object->Tr = 0;
+        object->t = 8;
+      }
+    }
+
+    int remainingBits = object->codewordLength - readBits;
+    int read = remainingBits <= object->t? remainingBits: object->t;
+
+    if((remainingBits - object->t) >= 0) {
+      object->interval |= ((long) object->Tr & BIT_MASKS[read]) << (remainingBits - object->t);
+    } else {
+      object->interval |= ((long) object->Tr >> (object->t - remainingBits)) & BIT_MASKS[read];
+    }
+    assert(object->interval >= 0 && object->interval <= object->codewordMax);
+
+    object->t -= read;
+    assert(object->t >= 0 && object->t <= 8);
+
+    readBits += read;
+  } while(readBits < object->codewordLength);
+}
+
+/**
+ * Changes the current stream. When encoding, before calling this function the stream
+ * should be terminated calling the <code>terminate</code> function, and after calling
+ * this function the function <code>restartEncoding</code> must be called. When decoding,
+ * after calling this function the function <code>restartDecoding</code> must be called.
+ *
+ * @param stream the new ByteStream
+ */
+void changeStream(ArithmeticCoderFLW *object, ByteStream *stream) {
+  if(stream == NULL) {
+    stream = (ByteStream *) malloc(sizeof(ByteStream));
+    memcpy(stream, &BS_default, sizeof(ByteStream));
+    ByteStream_0(stream);
+  }
+  object->stream = stream;
+}
+
+/**
  * Resets the state of all contexts.
  */
 void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object) {
@@ -252,6 +536,39 @@ void restartDecoding(ArithmeticCoderFLW *object) {
   object->Tr = 0;
   object->L = 0;
   object->t = 0;
+}
+
+/**
+ * Terminates the current stream using an optimal termination (for encoding purposes).
+ *
+ * @throws Exception when some problem manipulating the stream occurs
+ */
+void terminate(ArithmeticCoderFLW *object) {
+  long interval1 = 0;
+  long interval2 = 0;
+  int bits = object->codewordLength;
+  long intervalMax = object->intervalMin + object->intervalSize;
+  while(((interval1 < object->intervalMin) || (interval1 > intervalMax))
+    && ((interval2 < object->intervalMin) || (interval2 > intervalMax))){
+    bits--;
+    interval1 |= ((long) 1 << bits) & object->intervalMin;
+    interval2 |= ((long) 1 << bits) & intervalMax;
+  }
+
+  if((interval1 >= object->intervalMin) && (interval1 <= intervalMax)){
+    object->interval = interval1;
+  } else {
+    assert((interval2 >= object->intervalMin) && (interval2 <= intervalMax));
+    object->interval = interval2;
+  }
+  assert(bits >= 0);
+
+  transferInterval(object, object->codewordLength - bits);
+  if(object->t != 8){
+    putByte(object->stream, (unsigned char) object->Tr);
+    object->Tr = 0;
+    object->t = 8;
+  }
 }
 
 /**

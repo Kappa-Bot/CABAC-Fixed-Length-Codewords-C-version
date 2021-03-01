@@ -25,6 +25,7 @@ typedef struct SA_s SegmentsArray;
 
 struct FC_s {
   char *fileName;
+  FILE *file;
   int descriptor;
   int size;
 };
@@ -44,12 +45,12 @@ struct BS_s {
   // omp_lock_t lock;                // For lock access shared by multiple threads
 } BS_default = {                  // Default values for initial "instance"
   -1,                             // streamMode
-  {(unsigned char *) NULL, 0},    // buffer
+  {NULL, 0},    // buffer
   0,                              // limit
   0,                              // position
-  {(char *) NULL, -1, 0},         // readFileChannel
+  {NULL, NULL, -1, 0},         // readFileChannel
   -1,                             // readFileNumSegments
-  {(long **) NULL, 0},            // readFileSegments
+  {NULL, 0},            // readFileSegments
   -1,                             // temporalFilePosition
   '\0',                           // temporalFileName
   {NULL, 0}                       // temporalBuffer
@@ -73,7 +74,7 @@ void putBytes_1(ByteStream *object, int num, int numBytes);
 void removeByte(ByteStream *object);
 void removeBytes(ByteStream *object, int num);
 unsigned char getByte_0(ByteStream *object);
-// int getBytes(ByteStream *object, int numBytes);
+int getBytes(ByteStream *object, int numBytes);
 int hasMoreBytes(ByteStream *object);
 unsigned char getByte_1(ByteStream *object, long index);
 ByteArray getByteStream(ByteStream *object);
@@ -240,6 +241,27 @@ unsigned char getByte_0(ByteStream *object) {
 }
 
 /**
+ * Gets the bytes in the current position, and places them to an integer. This function
+ * can only be called when the stream is in normal or readFile mode.
+ *
+ * @param numBytes number of bytes read
+ * @return the integer having the corresponding bytes
+ * @throws Exception when the end of the stream is reached
+ */
+int getBytes(ByteStream *object, int numBytes) {
+  assert((object->streamMode == 0) || (object->streamMode == 1));
+  int num = 0;
+  for(int b = numBytes - 1; b >= 0; b--) {
+    unsigned char getByte = getByte_0(object);
+    for(int i = 7; i >= 0; i--) {
+      int bitMask = 1 << i;
+      num += ((int) getByte & bitMask) << (b * 8);
+    }
+  }
+  return(num);
+}
+
+/**
  * Checks whether <code>get</code> functions can get more bytes. This function can only
  * be called when the stream is in normal or readFile mode.
  *
@@ -261,10 +283,8 @@ int hasMoreBytes(ByteStream *object) {
  */
 unsigned char getByte_1(ByteStream *object, long index) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
+  assert(index < 0 || index >= object->limit);
 
-  if((index < 0) || (index >= object->limit)) {
-    fprintf(stderr, "Invalid position.");
-  }
   unsigned char getByte = 0;
   if(object->streamMode == 0) {
     getByte = object->buffer.array[(int) index];
@@ -283,8 +303,8 @@ unsigned char getByte_1(ByteStream *object, long index) {
     assert(fcPosition < object->readFileChannel.size);
 
     //Gets the byte
-    // This needs a fseek() before the read() call
-    // readFileChannel.read(temporalBuffer, fcPosition);
+    fseek(object->readFileChannel.file, fcPosition, SEEK_SET);
+    fread(&object->temporalBuffer.array[0], 1, 1, object->readFileChannel.file);
     getByte = object->temporalBuffer.array[0];
   } else {
     assert(1 == 0);
