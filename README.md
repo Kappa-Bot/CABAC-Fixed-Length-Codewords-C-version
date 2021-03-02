@@ -1,9 +1,8 @@
 # ACFLW - Java2C
-This is a transcription from an implementation of an Arithmetic encoder/decoder from Java to C. This work also aims to improve performance of the algorithm in C, mantaining its compression behaviour.
-## Transcription
-  - [X] ArithmeticCoderFLW
-  - [ ] ByteStream
-  - [ ] \(Optional) Manage to externally use Java's ByteStream instances
+This is a transcription from an implementation of an Arithmetic encoder/decoder from Java to C. This work also aims to improve performance of the algorithm in C, mantaining and enough-equivalent compression behaviour.
+## Transcription (despite system testing)
+  - [X] ArithmeticCoderFLW  -> 100%
+  - [ ] ByteStream          -> 78%
 ## Evaluation: Java vs C
 ### Streams generator
   - [X] On Java
@@ -13,7 +12,7 @@ This is a transcription from an implementation of an Arithmetic encoder/decoder 
   - [X] FLWToProb
   - [ ] encodebitProb
   - [ ] decodebitProb
-  - [ ] putByte/putBytes
+  - [X] putByte/putBytes
   - [ ] getByte/getBytes
   - [ ] transferInterval
   - [ ] fillInterval

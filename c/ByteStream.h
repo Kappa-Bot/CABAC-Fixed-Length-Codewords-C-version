@@ -152,7 +152,7 @@ void putByte(ByteStream *object, unsigned char b) {
     object->buffer.array = bufferTMP;
     object->buffer.length = object->buffer.length * 2;
   }
-  object->buffer.array = (unsigned char *) realloc(object->buffer.array, object->buffer.length + 1);
+  //object->buffer.array = (unsigned char *) realloc(object->buffer.array, object->buffer.length + 1);
   object->buffer.array[(int) object->limit] = b;
   object->limit++;
 }
@@ -173,11 +173,10 @@ void putBytes_0(ByteStream *object, ByteArray array, int offset, int length) {
     memcpy(bufferTMP, object->buffer.array, (int) object->limit);
     free(object->buffer.array);
     object->buffer.array = bufferTMP;
-    object->buffer.length = object->limit;
+    object->buffer.length = (object->buffer.length + length) * 2;
   }
   memcpy(object->buffer.array + object->limit, array.array + offset, length);
   object->limit += (long) length;
-  object->buffer.length += length;
 }
 
 /**
