@@ -1,104 +1,10 @@
-#ifndef BS_HH
-#define BS_HH
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
-// #include <omp.h>
-
-#define INITIAL_ALLOCATION 1024
-#define INITIAL_NUM_SEGMENTS 32
-
-struct BA_s {
-  unsigned char *array;
-  int length;
-};
-typedef struct BA_s ByteArray;
-
-struct SA_s {
-  long **array;
-  int length;
-};
-typedef struct SA_s SegmentsArray;
-
-struct FC_s {
-  char *fileName;
-  FILE *file;
-  int descriptor;
-  int size;
-};
-typedef struct FC_s FileChannel;
-
-struct BS_s {
-  int streamMode;                 // 0/1/2 <-> normal/readFile/temporalFile
-  ByteArray buffer;               // Array in which the bytes are stored
-  long limit;                     // X != 0
-  long position;                  // position <= limit
-  FileChannel readFileChannel;    // Only for readFile mode
-  int readFileNumSegments;        // 0 < X
-  SegmentsArray readFileSegments; // The indices are [segment][0- first byte, 1- length]
-  long temporalFilePosition;      // Only for temporalFile mode
-  char *temporalFileName;         // File name in which the stream is saved temporarily
-  ByteArray temporalBuffer;       // Only for readFile mode
-  // omp_lock_t lock;                // For lock access shared by multiple threads
-} BS_default = {                  // Default values for initial "instance"
-  -1,                             // streamMode
-  {NULL, 0},    // buffer
-  0,                              // limit
-  0,                              // position
-  {NULL, NULL, -1, 0},         // readFileChannel
-  -1,                             // readFileNumSegments
-  {NULL, 0},            // readFileSegments
-  -1,                             // temporalFilePosition
-  '\0',                           // temporalFileName
-  {NULL, 0}                       // temporalBuffer
-  // 0                               // lock
-};
-
-/**
- * Defines a default instance initialization using the following instruction:
- *  ByteStream *BS = (ByteStream *) malloc(sizeof(ByteStream));
- *  memcpy(BS, &BS_default, sizeof(ByteStream));
- *  ByteStream_0(BS);
- */
-typedef struct BS_s ByteStream;
-
-void ByteStream_0(ByteStream *object);
-void ByteStream_1(ByteStream *object, int initialAllocation);
-void ByteStream_2(ByteStream *object, FileChannel fc);
-
-void putByte(ByteStream *object, unsigned char b);
-void putBytes_0(ByteStream *object, ByteArray array, int offset, int length);
-void putBytes_1(ByteStream *object, int num, int numBytes);
-// void putFileSegment(ByteStream *object, long begin, long length);
-void removeByte(ByteStream *object);
-void removeBytes(ByteStream *object, int num);
-unsigned char getByte_0(ByteStream *object);
-int getBytes(ByteStream *object, int numBytes);
-int hasMoreBytes(ByteStream *object);
-unsigned char getByte_1(ByteStream *object, long index);
-ByteArray getByteStream(ByteStream *object);
-long getLength(ByteStream *object);
-long getPosition(ByteStream *object);
-void clear(ByteStream *object);
-void ByteStream_reset(ByteStream *object);
-void skip(ByteStream *object, long numBytes);
-// void endReadFileMode(ByteStream *object);
-void returnReadFileMode(ByteStream *object);
-void packetize(ByteStream *object);
-int isInReadNormalMode(ByteStream *object);
-int isInReadFileMode(ByteStream *object);
-int isInTemporalFile(ByteStream *object);
-// void write_0(ByteStream *object, FileOutputStream fos); // Need to implement FileOutputStream
-// void write_1(ByteStream *object, FileOutputStream fos, long begin, long length);
-// void saveToTemporalFile(ByteStream *object, String temporalDirectory);
-// void loadFromTemporalFile(ByteStream *object);
-void destroy(ByteStream *object);
-// void destroyTemporalFile(ByteStream *object);
-int getMemorySegments(ByteStream *object);
+#include "ByteStream.h"
 
 /**
  * Allocates memory for the buffer. The stream enters in the normal mode.
@@ -150,10 +56,11 @@ void putByte(ByteStream *object, unsigned char b) {
     memcpy(bufferTMP, object->buffer.array, object->limit);
     free(object->buffer.array);
     object->buffer.array = bufferTMP;
-    object->buffer.length = object->buffer.length * 2;
+    object->buffer.length = object->limit;
   }
-  object->buffer.array = (unsigned char *) realloc(object->buffer.array, object->buffer.length + 1);
+  object->buffer.array = (unsigned char *) realloc(object->buffer.array, object->limit + 1);
   object->buffer.array[(int) object->limit] = b;
+  object->buffer.length++;
   object->limit++;
 }
 
@@ -474,5 +381,3 @@ int getMemorySegments(ByteStream *object) {
   }
   return(memory);
 }
-
-#endif /* BS_HH */

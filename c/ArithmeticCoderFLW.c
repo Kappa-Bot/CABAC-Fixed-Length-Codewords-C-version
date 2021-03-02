@@ -1,101 +1,10 @@
-#ifndef ACFLW_HH
-#define ACFLW_HH
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
-#include "ByteStream.h"
-
-#define UPDATE_PROB0 7
-#define WINDOW_PROB 127
-
-const long BIT_MASKS[] = {0x0, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
-const int BIT_MASKS2[] = {1, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, \
-                    1 << 7, 1 << 8, 1 << 9, 1 << 10, 1 << 11, 1 << 12, \
-                    1 << 13, 1 << 14, 1 << 15, 1 << 16, 1 << 17, 1 << 18, \
-                    1 << 19, 1 << 20, 1 << 21, 1 << 22, 1 << 23, 1 << 24, \
-                    1 << 25, 1 << 26, 1 << 27, 1 << 28, 1 << 29, 1 << 30};
-
-struct ACFLW_s {
-  int  codewordLength;  // 0 < X < 64
-  int  precisionBits;   // 0 < X < 64, codewordLength + precisionBits < 64
-  long codewordMax;     // 2^codewordLength - 1
-  int  codewordBytes;   // ceil(codewordLength / 8)
-  int  precisionMid;    // 2^(precisionBits - 1)
-  long intervalMin;     // 0 < X < 2^codewordLength - 1
-  long intervalSize;    // 0 < interval - 1 < 2^codewordLength - 1
-  long interval;        // intervalMin <= X <= intervalMin + intervalSize
-  int  Tr;              // Flushed byte to the stream
-  int  t;               // Number of bits to transfer
-  int  L;               // Current position in the stream
-  int  numContexts;     // Number of contexts
-  ByteStream *stream;   // ByteStream employed by the coder, may contain zero bytes
-
-  int* contextProb0FLW; // Current probability of each contex
-  int* context0s;       // Number of 0s coded in this context
-  int* context0sWindow; // Number of 0s coded in the last WINDOW_PROB symbols coded
-  int* contextTotal;    // Total number of symbols coded in this context
-
-  int replenishment;    // True indicates that replenishment with 0s is activated
-} ACFLW_default = {     // Default values for initial "instance"
-  32,                   // codewordLength
-  15,                   // precisionBits
-  -1,                   // codewordMax
-  -1,                   // codewordBytes
-  -1,                   // precisionMid
-  -1,                   // intervalMin
-  -1,                   // intervalSize
-  -1,                   // interval
-  -1,                   // Tr
-  -1,                   // t
-  -1,                   // L
-  -1,                   // numContexts
-  NULL,                 // stream
-  NULL,                 // contextProb0FLW
-  NULL,                 // context0s
-  NULL,                 // context0sWindow
-  NULL,                 // contextTotal
-  1                     // replenishment
-};
-
-/**
- * Defines a default instance initialization using the following instruction:
- *  ArithmeticCoderFLW *ACFLW = (ArithmeticCoderFLW *) malloc(sizeof(ArithmeticCoderFLW));
- *  memcpy(ACFLW, &ACFLW_default, sizeof(ArithmeticCoderFLW));
- *  ArithmeticCoderFLW_0(ACFLW);
- */
-typedef struct ACFLW_s ArithmeticCoderFLW;
-
-void ArithmeticCoderFLW_0(ArithmeticCoderFLW *object);
-void ArithmeticCoderFLW_1(ArithmeticCoderFLW *object, int codewordLength);
-void ArithmeticCoderFLW_2(ArithmeticCoderFLW *object, int codewordLength, int precisionBits);
-void ArithmeticCoderFLW_3(ArithmeticCoderFLW *object, int codewordLength, int precisionBits, int numContexts);
-
-int prob0ToFLW(float prob0, int precisionBits);     // Tested
-float FLWToProb0(int prob0FLW, int precisionBits);  // Tested
-
-void encodeBit(ArithmeticCoderFLW *object, int bit);
-int decodeBit(ArithmeticCoderFLW *object);
-void encodeBitContext(ArithmeticCoderFLW *object, int bit, int context);
-int decodeBitContext(ArithmeticCoderFLW *object, int context);
-void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW);
-int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW);
-void encodeInteger(ArithmeticCoderFLW *object, int num, int numBits);
-int decodeInteger(ArithmeticCoderFLW *object, int numBits);
-void transferInterval(ArithmeticCoderFLW *object, int length);
-void fillInterval(ArithmeticCoderFLW *object);
-void changeStream(ArithmeticCoderFLW *object, ByteStream *stream);
-
-void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);
-void restartEncoding(ArithmeticCoderFLW *object);
-void restartDecoding(ArithmeticCoderFLW *object);
-void terminate(ArithmeticCoderFLW *object);
-int remainingBytes(ArithmeticCoderFLW *object);
-int getReadBytes(ArithmeticCoderFLW *object);
-void setReplenishment(ArithmeticCoderFLW *object, int replenishment);
+#include "ArithmeticCoderFLW.h"
 
 /**
  * Initializes internal registers. Before using the coder, a stream has to be set
@@ -606,5 +515,3 @@ int getReadBytes(ArithmeticCoderFLW *object) {
 void setReplenishment(ArithmeticCoderFLW *object, int replenishment) {
   object->replenishment = replenishment;
 }
-
-#endif /* ACFLW_HH */

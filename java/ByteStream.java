@@ -8,7 +8,7 @@
  * You should have received a copy of the BOI License along with this program.
  * If not, see <http://www.deic.uab.cat/~francesc/software/license/>.
  */
-package streams;
+//package streams;
 
 import java.io.File;
 import java.io.FileOutputStream;

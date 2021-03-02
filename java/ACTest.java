@@ -15,13 +15,16 @@ public class ACTest {
 
 
     public static void main(String[] args) throws IOException {
+      System.out.println("**************************************************************************");
       System.out.println("Initializing ArithmeticCoderFLW");
+      System.out.println("**************************************************************************");
       ArithmeticCoderFLW AC = new ArithmeticCoderFLW();
 
       System.out.println("prob0ToFLW + FLWToProb0 Test");
       for (int i = 0; i < 10; i++) {
         float prob0 = probSet[i];
-        System.out.print("-----------\nProbability: " + prob0 + "\n");
+        System.out.println("__________________________________________________________________________");
+        System.out.println("Probability: " + prob0);
 
         for (int j = 0; j < 10; j++) {
           int precisionBits = precisionSet[j];
@@ -30,13 +33,11 @@ public class ACTest {
           int realFLW = AC.prob0ToFLW(expectedProb, precisionBits);
           float realProb = AC.FLWToProb0(realFLW, precisionBits);
 
-          System.out.print("Bits: " + precisionBits
-                           + " -> " + expectedFLW
-                           + " -> " + expectedProb
-                           + " -> " + realFLW
-                           + " -> " + realProb + "\n");
+          System.out.printf("Bits: %d \t %6d \t %f \t %6d \t %f\n",
+                precisionBits, expectedFLW, expectedProb, realFLW, realProb);
         }
-        System.out.println("---------------------------------------");
       }
+      System.out.println("**************************************************************************");
+
     }
 }
