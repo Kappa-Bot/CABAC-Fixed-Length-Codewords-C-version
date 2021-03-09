@@ -63,45 +63,67 @@ struct ACFLW_s {
 
 /**
  * Defines a default instance initialization using the following instruction:
- *  ArithmeticCoderFLW *ACFLW = (ArithmeticCoderFLW *) malloc(sizeof(ArithmeticCoderFLW));
- *  memcpy(ACFLW, &ACFLW_default, sizeof(ArithmeticCoderFLW));
- *  ArithmeticCoderFLW_0(ACFLW);
+ *  memcpy(ACFLWNewInstance, &ACFLW_default, sizeof(ArithmeticCoderFLW));
  */
 typedef struct ACFLW_s ArithmeticCoderFLW;
 
-void ArithmeticCoderFLW_0(ArithmeticCoderFLW *object);
-void ArithmeticCoderFLW_1(ArithmeticCoderFLW *object, int codewordLength);
-void ArithmeticCoderFLW_2(ArithmeticCoderFLW *object, int codewordLength, int precisionBits);
-void ArithmeticCoderFLW_3(ArithmeticCoderFLW *object, int codewordLength, int precisionBits, int numContexts);
+ArithmeticCoderFLW *ArithmeticCoderFLWInit();                 // No test needed
 
-int prob0ToFLW(float prob0, int precisionBits);     // Tested
-float FLWToProb0(int prob0FLW, int precisionBits);  // Tested
+ArithmeticCoderFLW *ArithmeticCoderFLW_0();                   // No test needed
+ArithmeticCoderFLW *ArithmeticCoderFLW_1(int codewordLength); // No test needed
+ArithmeticCoderFLW *ArithmeticCoderFLW_2(int codewordLength,
+                                        int precisionBits);
+ArithmeticCoderFLW *ArithmeticCoderFLW_3(int codewordLength,  // No test needed
+                                        int precisionBits,
+                                        int numContexts);
+
+int prob0ToFLW(float prob0, int precisionBits);               // Tested
+float FLWToProb0(int prob0FLW, int precisionBits);            // Tested
 
 void encodeBit(ArithmeticCoderFLW *object, int bit);
 int decodeBit(ArithmeticCoderFLW *object);
-void encodeBitContext(ArithmeticCoderFLW *object, int bit, int context);
-int decodeBitContext(ArithmeticCoderFLW *object, int context);
-void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW);
-int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW);
-void encodeInteger(ArithmeticCoderFLW *object, int num, int numBits);
-int decodeInteger(ArithmeticCoderFLW *object, int numBits);
-void transferInterval(ArithmeticCoderFLW *object, int length);
+void encodeBitContext(ArithmeticCoderFLW *object,
+                    int bit,
+                    int context);
+int decodeBitContext(ArithmeticCoderFLW *object,
+                    int context);
+void encodeBitProb(ArithmeticCoderFLW *object,
+                    int bit,
+                    int prob0FLW);
+int decodeBitProb(ArithmeticCoderFLW *object,
+                    int prob0FLW);
+void encodeInteger(ArithmeticCoderFLW *object,
+                    int num,
+                    int numBits);
+int decodeInteger(ArithmeticCoderFLW *object,
+                    int numBits);
+void transferInterval(ArithmeticCoderFLW *object,
+                    int length);
 void fillInterval(ArithmeticCoderFLW *object);
-void changeStream(ArithmeticCoderFLW *object, ByteStream *stream);
+void changeStream(ArithmeticCoderFLW *object,                 // No test needed
+                    ByteStream *stream);
 
-void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);
-void restartEncoding(ArithmeticCoderFLW *object);
-void restartDecoding(ArithmeticCoderFLW *object);
+void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);    // No test needed
+void restartEncoding(ArithmeticCoderFLW *object);             // No test needed
+void restartDecoding(ArithmeticCoderFLW *object);             // No test needed
 void terminate(ArithmeticCoderFLW *object);
-int remainingBytes(ArithmeticCoderFLW *object);
-int getReadBytes(ArithmeticCoderFLW *object);
-void setReplenishment(ArithmeticCoderFLW *object, int replenishment);
+int remainingBytes(ArithmeticCoderFLW *object);               // No test needed
+int getReadBytes(ArithmeticCoderFLW *object);                 // No test needed
+void setReplenishment(ArithmeticCoderFLW *object,             // No test needed
+                    int replenishment);
+
+ArithmeticCoderFLW *ArithmeticCoderFLWInit() {
+  ArithmeticCoderFLW *object = (ArithmeticCoderFLW *) malloc(sizeof(ArithmeticCoderFLW));
+  memcpy(object, &ACFLW_default, sizeof(ArithmeticCoderFLW));
+  return object;
+}
 
 /**
  * Initializes internal registers. Before using the coder, a stream has to be set
  * through <code>changeStream</code>.
  */
-void ArithmeticCoderFLW_0(ArithmeticCoderFLW *object) {
+ArithmeticCoderFLW *ArithmeticCoderFLW_0() {
+  ArithmeticCoderFLW *object = ArithmeticCoderFLWInit();
   assert(object->codewordLength > 0);
   assert(object->precisionBits > 0);
   assert(object->codewordLength + object->precisionBits < 64);
@@ -110,6 +132,7 @@ void ArithmeticCoderFLW_0(ArithmeticCoderFLW *object) {
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
   restartEncoding(object);
+  return object;
 }
 
 /**
@@ -118,17 +141,17 @@ void ArithmeticCoderFLW_0(ArithmeticCoderFLW *object) {
  *
  * @param codewordLength number of bits of the codeword
  */
-void ArithmeticCoderFLW_1(ArithmeticCoderFLW *object, int codewordLength) {
+ArithmeticCoderFLW *ArithmeticCoderFLW_1(int codewordLength) {
+  ArithmeticCoderFLW *object = ArithmeticCoderFLWInit();
   object->codewordLength = codewordLength;
-
   assert(object->codewordLength > 0);
   assert(object->precisionBits > 0);
   assert(object->codewordLength + object->precisionBits < 64);
-
   object->codewordMax = ((long) 1 << object->codewordLength) - 1;
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
   restartEncoding(object);
+  return object;
 }
 
 /**
@@ -138,18 +161,18 @@ void ArithmeticCoderFLW_1(ArithmeticCoderFLW *object, int codewordLength) {
  * @param codewordLength number of bits of the codeword
  * @param precisionBits number of bits employed in the probabilities
  */
-void ArithmeticCoderFLW_2(ArithmeticCoderFLW *object, int codewordLength, int precisionBits) {
+ArithmeticCoderFLW *ArithmeticCoderFLW_2(int codewordLength, int precisionBits) {
+  ArithmeticCoderFLW *object = ArithmeticCoderFLWInit();
   object->codewordLength = codewordLength;
   object->precisionBits = precisionBits;
-
   assert(object->codewordLength > 0);
   assert(object->precisionBits > 0);
   assert(object->codewordLength + object->precisionBits < 64);
-
   object->codewordMax = ((long) 1 << object->codewordLength) - 1;
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
   restartEncoding(object);
+  return object;
 }
 
 /**
@@ -160,16 +183,17 @@ void ArithmeticCoderFLW_2(ArithmeticCoderFLW *object, int codewordLength, int pr
  * @param precisionBits number of bits employed in the probabilities
  * @param numContexts number of contexts available for this object
  */
-void ArithmeticCoderFLW_3(ArithmeticCoderFLW *object, int codewordLength, int precisionBits, int numContexts) {
+ArithmeticCoderFLW *ArithmeticCoderFLW_3(int codewordLength,
+                                        int precisionBits,
+                                        int numContexts) {
+  ArithmeticCoderFLW *object = ArithmeticCoderFLWInit();
   object->codewordLength = codewordLength;
   object->precisionBits = precisionBits;
   object->numContexts = numContexts;
-
   assert(object->codewordLength > 0);
   assert(object->precisionBits > 0);
   assert(object->numContexts > 0);
   assert(object->codewordLength + object->precisionBits < 64);
-
   object->codewordMax = ((long) 1 << object->codewordLength) - 1;
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
@@ -179,6 +203,7 @@ void ArithmeticCoderFLW_3(ArithmeticCoderFLW *object, int codewordLength, int pr
   object->contextTotal = (int *) malloc(object->numContexts * sizeof(int));
   ArithmeticCoderFLW_reset(object);
   restartEncoding(object);
+  return object;
 }
 
 /**
@@ -243,6 +268,7 @@ int decodeBit(ArithmeticCoderFLW *object) {
 
 
 /**
+
  * Encodes a bit using a context so that the probabilities are adaptively adjusted
  * depending on the incoming symbols.
  *
@@ -257,9 +283,12 @@ void encodeBitContext(ArithmeticCoderFLW *object, int bit, int context) {
 		} else if(object->context0s[context] == object->contextTotal[context]) {
 			object->contextProb0FLW[context] = (1 << object->precisionBits) - 1;
 		} else {
-			object->contextProb0FLW[context] = (object->context0s[context] << object->precisionBits) / object->contextTotal[context];
+			object->contextProb0FLW[context] =
+        (object->context0s[context] << object->precisionBits)
+        / object->contextTotal[context];
 		}
-		assert((object->contextProb0FLW[context] > 0) && (object->contextProb0FLW[context] < (1 << object->precisionBits)));
+		assert((object->contextProb0FLW[context] > 0) &&
+      (object->contextProb0FLW[context] < (1 << object->precisionBits)));
 		if((object->contextTotal[context] & WINDOW_PROB) == WINDOW_PROB) {
 			if(object->context0sWindow[context] != -1) {
 				object->contextTotal[context] -= WINDOW_PROB;
@@ -498,12 +527,7 @@ void fillInterval(ArithmeticCoderFLW *object) {
  * @param stream the new ByteStream
  */
 void changeStream(ArithmeticCoderFLW *object, ByteStream *stream) {
-  if(stream == NULL) {
-    stream = (ByteStream *) malloc(sizeof(ByteStream));
-    memcpy(stream, &BS_default, sizeof(ByteStream));
-    ByteStream_0(stream);
-  }
-  object->stream = stream;
+  object->stream = stream == NULL ? ByteStream_0(stream) : stream;
 }
 
 /**

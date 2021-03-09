@@ -10,9 +10,7 @@
 int main() {
   printf("%s\n", H1);
   printf("Initializing ByteStream\n");
-  ByteStream *BS = (ByteStream *) malloc(sizeof(ByteStream));
-  memcpy(BS, &BS_default, sizeof(ByteStream));
-  ByteStream_0(BS);
+  ByteStream *BS = ByteStream_0();
   printf("%s\n", H1);
   printf("%41s\n", "putByte Test");
   printf("%s\n", H2);
@@ -38,10 +36,11 @@ int main() {
   /* **************************************************** */
   printf("%42s\n", "putBytes_0 Test");
   printf("%s\n", H2);
-  BS = (ByteStream *) malloc(sizeof(ByteStream));
-  memcpy(BS, &BS_default, sizeof(ByteStream));
-  ByteStream_0(BS);
-  ByteArray arr = {(unsigned char []){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, 16};
+  BS = ByteStream_0();
+  ByteArray arr = {
+    (unsigned char []){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+    16
+  };
   for (int i = 0; i < 10; i++) {
     ptr = BS->buffer.array;
     verif = 1;
@@ -62,9 +61,7 @@ int main() {
   /* **************************************************** */
   printf("%42s\n", "putBytes_1 Test");
   printf("%s\n", H2);
-  BS = (ByteStream *) malloc(sizeof(ByteStream));
-  memcpy(BS, &BS_default, sizeof(ByteStream));
-  ByteStream_0(BS);
+  BS = ByteStream_0();
   for (int i = 0; i < 10; i++) {
     ptr = BS->buffer.array;
     verif = 1;

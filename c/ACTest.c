@@ -14,9 +14,7 @@ int main() {
   printf("Initializing ArithmeticCoderFLW\n");
   printf("**************************************************************************\n");
 
-  ArithmeticCoderFLW *ACFLW = (ArithmeticCoderFLW *) malloc(sizeof(ArithmeticCoderFLW));
-  memcpy(ACFLW, &ACFLW_default, sizeof(ArithmeticCoderFLW));
-  ArithmeticCoderFLW_0(ACFLW);
+  ArithmeticCoderFLW *ACFLW = ArithmeticCoderFLW_0();
   // Dont need the BS for now
 
   printf("prob0ToFLW + FLWToProb0 Test\n");
