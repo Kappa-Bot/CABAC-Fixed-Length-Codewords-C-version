@@ -36,6 +36,9 @@ int main() {
   }
   printf("**************************************************************************\n");
 
+  ByteStream *BS = ByteStream_0();
+  free(BS);
+
   free(ACFLW);
 
   return(0);
