@@ -7,6 +7,7 @@ struct SG_s {
 };
 typedef struct SG_s StreamGenerator;
 
+StreamGenerator sgConfig(char *path, char *ext);
 void sgGenerate(StreamGenerator object, int fileSize, int count);
 
 #endif /* SG_HH */

@@ -237,7 +237,7 @@ unsigned char getByte_1(ByteStream *object, long index) {
     assert(fcPosition < fcSize(object->readFileChannel));
 
     //Gets the byte
-    fcRead(&object->readFileChannel, object->temporalBuffer, fcPosition);
+    fcRead(object->readFileChannel, object->temporalBuffer, fcPosition);
     getByte = object->temporalBuffer.array[0];
   } else {
     assert(1 == 0);
@@ -437,10 +437,10 @@ void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
     } while(!access(object->temporalFileName, F_OK));
   }
 
-  FileChannel fc = {fopen(object->temporalFileName, "w")};
-  object->temporalFilePosition = fcGetPosition(&fc);
-  fcWrite(&fc, object->buffer);
-  fcClose(&fc);
+  FileChannel fc = fcConfig(object->temporalFileName, "rb+");
+  object->temporalFilePosition = fcGetPosition(fc);
+  fcWrite(fc, object->buffer);
+  fcClose(fc);
   // omp_unset_lock(object->lock);
   free(object->buffer.array);
   object->streamMode = 2;
@@ -458,10 +458,10 @@ void loadFromTemporalFile(ByteStream *object) {
   object->buffer.array = (unsigned char *) malloc((int) object->limit);
   object->buffer.length = object->limit;
 
-  FileChannel fc = {fopen(object->temporalFileName, "r")};
-  fcPosition(&fc, object->temporalFilePosition);
-  fcRead(&fc, object->buffer, 0);
-  fcClose(&fc);
+  FileChannel fc = fcConfig(object->temporalFileName, "r");
+  fcPosition(fc, object->temporalFilePosition);
+  fcRead(fc, object->buffer, 0);
+  fcClose(fc);
   object->temporalFilePosition = -1;
   object->streamMode = 0;
 }

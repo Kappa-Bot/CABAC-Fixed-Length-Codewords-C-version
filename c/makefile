@@ -12,19 +12,22 @@ compile:
 	$(CC) $(CCFLAGS) $(CCRESFLAGS)                            ByteStream.c               -o ByteStream.o
 	$(CC) $(CCFLAGS) $(CCRESFLAGS)                                         FileChannel.c -o FileChannel.o
 	$(CC) $(CCFLAGS) $(CCRESFLAGS)       StreamGenerator.c                               -o StreamGenerator.o
+	$(CC) $(CCFLAGS) $(CCRESFLAGS)       StreamChecker.c                                 -o StreamChecker.o
 
 	$(CC) $(CCFLAGS) ACTest.c ArithmeticCoderFLW.o ByteStream.o FileChannel.o -o ACTest.o
 	$(CC) $(CCFLAGS) BSTest.c                      ByteStream.o FileChannel.o -o BSTest.o
 	$(CC) $(CCFLAGS) FCTest.c                                   FileChannel.o -o FCTest.o
 	$(CC) $(CCFLAGS) SGTest.c StreamGenerator.o                               -o SGTest.o
+	$(CC) $(CCFLAGS) SCTest.c StreamChecker.o                                 -o SCTest.o
 
-	$(RM) ArithmeticCoderFLW.o ByteStream.o FileChannel.o StreamGenerator.o
+	$(RM) ArithmeticCoderFLW.o ByteStream.o FileChannel.o StreamGenerator.o StreamChecker.o
 
 once:
 	$(CC) $(CCFLAGS) ACTest.c ArithmeticCoderFLW.c ByteStream.c FileChannel.c -o ACTest.o
 	$(CC) $(CCFLAGS) BSTest.c                      ByteStream.c FileChannel.c -o BSTest.o
 	$(CC) $(CCFLAGS) FCTest.c                                   FileChannel.c -o FCTest.o
 	$(CC) $(CCFLAGS) SGTest.c StreamGenerator.c                               -o SGTest.o
+	$(CC) $(CCFLAGS) SCTest.c StreamChecker.c                                 -o SCTest.o
 
 clean:
 	$(RM) *.o

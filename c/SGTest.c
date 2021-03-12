@@ -3,11 +3,12 @@
 #define PATH "../files/"
 #define EXT ".tmp"
 #define FILESIZE 32
-#define FILECOUNT 8
+#define FILECOUNT 2
 
-StreamGenerator SG = { PATH, EXT };
+StreamGenerator SG;
 
 int main() {
+  SG = sgConfig(PATH, EXT);
   sgGenerate(SG, FILESIZE, FILECOUNT);
   return 0;
 }
