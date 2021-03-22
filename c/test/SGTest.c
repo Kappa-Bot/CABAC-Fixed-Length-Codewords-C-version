@@ -1,6 +1,6 @@
-#include "StreamGenerator.h"
+#include "../util/StreamGenerator.h"
 
-#define PATH "../files/"
+#define PATH "../../files/"
 #define EXT ".tmp"
 #define FILESIZE 32
 #define FILECOUNT 2

@@ -56,31 +56,35 @@ extern float FLWToProb0(int prob0FLW, int precisionBits);            // Tested
 
 extern void encodeBit(ArithmeticCoderFLW *object, int bit);
 extern int decodeBit(ArithmeticCoderFLW *object);
+
 extern void encodeBitContext(ArithmeticCoderFLW *object,
-                            int bit,
-                            int context);
+                            int bit, int context);
 extern int decodeBitContext(ArithmeticCoderFLW *object,
                             int context);
+
 extern void encodeBitProb(ArithmeticCoderFLW *object,
-                            int bit,
-                            int prob0FLW);
+                            int bit, int prob0FLW);
 extern int decodeBitProb(ArithmeticCoderFLW *object,
                             int prob0FLW);
+
 extern void encodeInteger(ArithmeticCoderFLW *object,
-                            int num,
-                            int numBits);
+                            int num, int numBits);
 extern int decodeInteger(ArithmeticCoderFLW *object,
                             int numBits);
+
 extern void transferInterval(ArithmeticCoderFLW *object,
                             int length);
 extern void fillInterval(ArithmeticCoderFLW *object);
+
 extern void changeStream(ArithmeticCoderFLW *object,                 // No test needed
                             ByteStream *stream);
 
 extern void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);    // No test needed
 extern void restartEncoding(ArithmeticCoderFLW *object);             // No test needed
 extern void restartDecoding(ArithmeticCoderFLW *object);             // No test needed
+
 extern void terminate(ArithmeticCoderFLW *object);
+
 extern int remainingBytes(ArithmeticCoderFLW *object);               // No test needed
 extern int getReadBytes(ArithmeticCoderFLW *object);                 // No test needed
 extern void setReplenishment(ArithmeticCoderFLW *object,             // No test needed

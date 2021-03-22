@@ -149,7 +149,8 @@ void putFileSegment(ByteStream *object, long begin, long length) {
   assert(object->readFileNumSegments <= object->readFileSegments.length);
 
   if(object->readFileNumSegments == object->readFileSegments.length) {
-    long** fcSegmentsTMP = (long **) malloc(object->readFileSegments.length * 2 * 2 * sizeof(long));
+    long** fcSegmentsTMP = (long **) malloc
+        (object->readFileSegments.length * 2 * 2 * sizeof(long));
     for(int segment = 0; segment < object->readFileNumSegments; segment++) {
       fcSegmentsTMP[segment][0] = object->readFileSegments.array[segment][0];
       fcSegmentsTMP[segment][1] = object->readFileSegments.array[segment][1];
@@ -233,7 +234,8 @@ unsigned char getByte_1(ByteStream *object, long index) {
     assert(segment < object->readFileNumSegments);
 
     //Determines the position in the file
-    long fcPosition = index - accBytes + object->readFileSegments.array[segment][0];
+    long fcPosition = index - accBytes
+                + object->readFileSegments.array[segment][0];
     assert(fcPosition < fcSize(object->readFileChannel));
 
     //Gets the byte
@@ -425,23 +427,26 @@ int isInTemporalFile(ByteStream *object) {
 void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
   assert(object->streamMode == 0);
   int num = 0;
+  int verif = temporalDirectory[strlen(temporalDirectory) - 1] == '/';
 
   // omp_set_lock(lock);
+
   //Checks whether is the first time an object of this class is saved to the temporal file
   if(object->temporalFileName == NULL) {
     do {
-      int verif = temporalDirectory[strlen(temporalDirectory) - 1] == '/';
       sprintf(object->temporalFileName, "%s%s%d.tmp",
-            temporalDirectory, verif ? "/TMP-" : "TMP-", num);
+          temporalDirectory, verif ? "/TMP-" : "TMP-", num);
       num += 1;
     } while(!access(object->temporalFileName, F_OK));
   }
 
-  FileChannel fc = fcConfig(object->temporalFileName, "rb+");
+  FileChannel fc = fcConfig(object->temporalFileName, "w");
   object->temporalFilePosition = fcGetPosition(fc);
   fcWrite(fc, object->buffer);
   fcClose(fc);
+
   // omp_unset_lock(object->lock);
+
   free(object->buffer.array);
   object->streamMode = 2;
 }

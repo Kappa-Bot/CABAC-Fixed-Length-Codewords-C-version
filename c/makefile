@@ -1,33 +1,46 @@
-# Just don't
-# gcc -Wl,--allow-multiple-definition -O3 -Wall -lm -DNDEBUG ArithmeticCoderFLW.c ByteStream.c ACTest.c -o main.o
 CCFLAGS = -Wall -O3 -lm -DNDEBUG
-CCRESFLAGS = -c
 
 CC = gcc
 
 default: compile
 
+#src/%.o : src/%.c
+#	$(CC) $(CCFLAGS) -o src/$< -o src/$@
+
+#util/%.o : util/%.c
+#	$(CC) $(CCFLAGS) -o util/$< -o util/$@
+
+ACFLW src/ArithmeticCoderFLW.o : src/ArithmeticCoderFLW.c src/ArithmeticCoderFLW.h
+	$(CC) $(CCFLAGS) -c src/ArithmeticCoderFLW.c -o src/ArithmeticCoderFLW.o
+BS src/ByteStream.o : src/ByteStream.c src/ByteStream.h
+	$(CC) $(CCFLAGS) -c src/ByteStream.c -o src/ByteStream.o
+FC src/FileChannel.o : src/FileChannel.c src/FileChannel.h
+	$(CC) $(CCFLAGS) -c src/FileChannel.c -o src/FileChannel.o
+
+SG util/StreamGenerator.o : util/StreamGenerator.c util/StreamGenerator.h
+	$(CC) $(CCFLAGS) -c util/StreamGenerator.c -o util/StreamGenerator.o
+SC util/StreamChecker.o : util/StreamChecker.c util/StreamChecker.h
+	$(CC) $(CCFLAGS) -c util/StreamChecker.c -o util/StreamChecker.o
+
+ACT test/ACTest.o : test/ACTest.c src/ArithmeticCoderFLW.o src/ByteStream.o src/FileChannel.o
+	$(CC) $(CCFLAGS) test/ACTest.c src/ArithmeticCoderFLW.o src/ByteStream.o src/FileChannel.o -o test/ACTest.o
+BST test/BSTest.o : test/BSTest.c src/ByteStream.o src/FileChannel.o
+	$(CC) $(CCFLAGS) test/BSTest.c src/ByteStream.o src/FileChannel.o -o test/ACTest.o
+FCT test/FCTest.o : test/FCTest.c src/FileChannel.o
+	$(CC) $(CCFLAGS) test/FCTest.c src/FileChannel.o -o test/ACTest.o
+SGT test/SGTest.o : test/SGTest.c util/StreamGenerator.o
+	$(CC) $(CCFLAGS) test/SGTest.c util/StreamGenerator.o -o test/SGTest.o
+SCT test/SCTest.o : test/SCTest.c util/StreamChecker.o
+	$(CC) $(CCFLAGS) test/SCTest.c util/StreamChecker.o -o test/SCTest.o
+
 compile:
-	$(CC) $(CCFLAGS) $(CCRESFLAGS)       ArithmeticCoderFLW.c                            -o ArithmeticCoderFLW.o
-	$(CC) $(CCFLAGS) $(CCRESFLAGS)                            ByteStream.c               -o ByteStream.o
-	$(CC) $(CCFLAGS) $(CCRESFLAGS)                                         FileChannel.c -o FileChannel.o
-	$(CC) $(CCFLAGS) $(CCRESFLAGS)       StreamGenerator.c                               -o StreamGenerator.o
-	$(CC) $(CCFLAGS) $(CCRESFLAGS)       StreamChecker.c                                 -o StreamChecker.o
-
-	$(CC) $(CCFLAGS) ACTest.c ArithmeticCoderFLW.o ByteStream.o FileChannel.o -o ACTest.o
-	$(CC) $(CCFLAGS) BSTest.c                      ByteStream.o FileChannel.o -o BSTest.o
-	$(CC) $(CCFLAGS) FCTest.c                                   FileChannel.o -o FCTest.o
-	$(CC) $(CCFLAGS) SGTest.c StreamGenerator.o                               -o SGTest.o
-	$(CC) $(CCFLAGS) SCTest.c StreamChecker.o                                 -o SCTest.o
-
-	$(RM) ArithmeticCoderFLW.o ByteStream.o FileChannel.o StreamGenerator.o StreamChecker.o
-
-once:
-	$(CC) $(CCFLAGS) ACTest.c ArithmeticCoderFLW.c ByteStream.c FileChannel.c -o ACTest.o
-	$(CC) $(CCFLAGS) BSTest.c                      ByteStream.c FileChannel.c -o BSTest.o
-	$(CC) $(CCFLAGS) FCTest.c                                   FileChannel.c -o FCTest.o
-	$(CC) $(CCFLAGS) SGTest.c StreamGenerator.c                               -o SGTest.o
-	$(CC) $(CCFLAGS) SCTest.c StreamChecker.c                                 -o SCTest.o
+	cd src/;  $(CC) $(CCFLAGS) -c *.c; cd ../;
+	cd util/; $(CC) $(CCFLAGS) -c *.c; cd ../;
+	$(CC) $(CCFLAGS) test/ACTest.c src/ArithmeticCoderFLW.o src/ByteStream.o src/FileChannel.o -o test/ACTest.o
+	$(CC) $(CCFLAGS) test/BSTest.c                          src/ByteStream.o src/FileChannel.o -o test/BSTest.o
+	$(CC) $(CCFLAGS) test/FCTest.c                                           src/FileChannel.o -o test/FCTest.o
+	$(CC) $(CCFLAGS) test/SGTest.c util/StreamGenerator.o                                      -o test/SGTest.o
+	$(CC) $(CCFLAGS) test/SCTest.c util/StreamChecker.o                                        -o test/SCTest.o
 
 clean:
-	$(RM) *.o
+	$(RM) */*.o

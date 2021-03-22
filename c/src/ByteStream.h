@@ -38,7 +38,7 @@ extern ByteStream *ByteStream_1(int initialAllocation);            // No test ne
 extern ByteStream *ByteStream_2(FileChannel fc);                   // No test needed
 
 extern void putByte(ByteStream *object, unsigned char b);          // Tested
-extern void putBytes_0(ByteStream *object, ByteBuffer array,        // Tested
+extern void putBytes_0(ByteStream *object, ByteBuffer array,       // Tested
                 int offset, int length);
 extern void putBytes_1(ByteStream *object, int num, int numBytes); // Tested
 
@@ -52,15 +52,17 @@ extern unsigned char getByte_1(ByteStream *object, long index);
 extern int getBytes(ByteStream *object, int numBytes);
 
 extern int hasMoreBytes(ByteStream *object);                       // No test needed
-extern ByteBuffer getByteStream(ByteStream *object);                // No test needed
+extern ByteBuffer getByteStream(ByteStream *object);               // No test needed
 extern long getLength(ByteStream *object);                         // No test needed
 extern long getPosition(ByteStream *object);                       // No test needed
 
 extern void clear(ByteStream *object);                             // No test needed
 extern void ByteStream_reset(ByteStream *object);                  // No test needed
 extern void skip(ByteStream *object, long numBytes);
+
 // void endReadFileMode(ByteStream *object);
 extern void returnReadFileMode(ByteStream *object);
+
 extern void packetize(ByteStream *object);
 
 extern int isInReadNormalMode(ByteStream *object);                 // No test needed
@@ -69,8 +71,10 @@ extern int isInTemporalFile(ByteStream *object);                   // No test ne
 
 // void write_0(ByteStream *object, FileOutputStream fos); // Need to implement FileOutputStream
 // void write_1(ByteStream *object, FileOutputStream fos, long begin, long length);
+
 extern void saveToTemporalFile(ByteStream *object, char *temporalDirectory);
 extern void loadFromTemporalFile(ByteStream *object);
+
 extern void destroy(ByteStream *object);
 extern void destroyTemporalFile(ByteStream *object);
 extern int getMemorySegments(ByteStream *object);

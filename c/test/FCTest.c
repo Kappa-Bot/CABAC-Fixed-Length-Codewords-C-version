@@ -2,11 +2,11 @@
 #include <stdlib.h>
 
 #ifndef FC_HH
-#include "FileChannel.h"
+#include "../src/FileChannel.h"
 #endif
 
-#define FILENAME1 "../files/fc1.tmp"
-#define FILENAME2 "../files/fc2.tmp"
+#define FILENAME1 "../../files/fc1.tmp"
+#define FILENAME2 "../../files/fc2.tmp"
 
 FileChannel FC1 = {};
 FileChannel FC2 = {};

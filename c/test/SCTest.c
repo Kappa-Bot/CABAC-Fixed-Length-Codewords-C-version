@@ -1,13 +1,13 @@
 #include <stdio.h>
-#include "StreamChecker.h"
+#include "../util/StreamChecker.h"
 
 #define H1 "**************************************************************************"
 #define H2 "__________________________________________________________________________"
 
-#define FILENAME1 "../files/fc1.tmp"
-#define FILENAME2 "../files/fc2.tmp"
-#define FILENAME3 "../files/0.tmp"
-#define FILENAME4 "../files/1.tmp"
+#define FILENAME1 "../../files/fc1.tmp"
+#define FILENAME2 "../../files/fc2.tmp"
+#define FILENAME3 "../../files/0.tmp"
+#define FILENAME4 "../../files/1.tmp"
 
 void runTest(char *file1, char *file2) {
   printf("%s\n", H1);
