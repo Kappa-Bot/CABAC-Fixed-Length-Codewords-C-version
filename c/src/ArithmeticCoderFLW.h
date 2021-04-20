@@ -41,53 +41,53 @@ extern struct ACFLW_s {
  */
 typedef struct ACFLW_s ArithmeticCoderFLW;
 
-extern ArithmeticCoderFLW *ArithmeticCoderFLWInit();                 // No test needed
+extern ArithmeticCoderFLW *ArithmeticCoderFLWInit();
 
-extern ArithmeticCoderFLW *ArithmeticCoderFLW_0();                   // No test needed
-extern ArithmeticCoderFLW *ArithmeticCoderFLW_1(int codewordLength); // No test needed
+extern ArithmeticCoderFLW *ArithmeticCoderFLW_0();
+extern ArithmeticCoderFLW *ArithmeticCoderFLW_1(int codewordLength);
 extern ArithmeticCoderFLW *ArithmeticCoderFLW_2(int codewordLength,
                                                 int precisionBits);
-extern ArithmeticCoderFLW *ArithmeticCoderFLW_3(int codewordLength,  // No test needed
+extern ArithmeticCoderFLW *ArithmeticCoderFLW_3(int codewordLength,
                                                 int precisionBits,
                                                 int numContexts);
 
 extern int prob0ToFLW(float prob0, int precisionBits);               // Tested
 extern float FLWToProb0(int prob0FLW, int precisionBits);            // Tested
 
-extern void encodeBit(ArithmeticCoderFLW *object, int bit);
+extern void encodeBit(ArithmeticCoderFLW *object, int bit);          // Tested
 extern int decodeBit(ArithmeticCoderFLW *object);
 
-extern void encodeBitContext(ArithmeticCoderFLW *object,
+extern void encodeBitContext(ArithmeticCoderFLW *object,             // Tested
                             int bit, int context);
 extern int decodeBitContext(ArithmeticCoderFLW *object,
                             int context);
 
-extern void encodeBitProb(ArithmeticCoderFLW *object,
+extern void encodeBitProb(ArithmeticCoderFLW *object,                // Tested
                             int bit, int prob0FLW);
 extern int decodeBitProb(ArithmeticCoderFLW *object,
                             int prob0FLW);
 
-extern void encodeInteger(ArithmeticCoderFLW *object,
+extern void encodeInteger(ArithmeticCoderFLW *object,                // Tested
                             int num, int numBits);
 extern int decodeInteger(ArithmeticCoderFLW *object,
                             int numBits);
 
-extern void transferInterval(ArithmeticCoderFLW *object,
+extern void transferInterval(ArithmeticCoderFLW *object,             // Tested
                             int length);
 extern void fillInterval(ArithmeticCoderFLW *object);
 
-extern void changeStream(ArithmeticCoderFLW *object,                 // No test needed
+extern void changeStream(ArithmeticCoderFLW *object,
                             ByteStream *stream);
 
-extern void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);    // No test needed
-extern void restartEncoding(ArithmeticCoderFLW *object);             // No test needed
-extern void restartDecoding(ArithmeticCoderFLW *object);             // No test needed
+extern void ArithmeticCoderFLW_reset(ArithmeticCoderFLW *object);
+extern void restartEncoding(ArithmeticCoderFLW *object);
+extern void restartDecoding(ArithmeticCoderFLW *object);
 
 extern void terminate(ArithmeticCoderFLW *object);
 
-extern int remainingBytes(ArithmeticCoderFLW *object);               // No test needed
-extern int getReadBytes(ArithmeticCoderFLW *object);                 // No test needed
-extern void setReplenishment(ArithmeticCoderFLW *object,             // No test needed
+extern int remainingBytes(ArithmeticCoderFLW *object);
+extern int getReadBytes(ArithmeticCoderFLW *object);
+extern void setReplenishment(ArithmeticCoderFLW *object,
                     int replenishment);
 
 

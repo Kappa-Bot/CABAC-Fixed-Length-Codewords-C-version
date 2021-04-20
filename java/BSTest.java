@@ -1,6 +1,11 @@
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.FileSystems;
+import java.nio.file.StandardOpenOption;
 
 
 public class BSTest {
@@ -177,6 +182,54 @@ public class BSTest {
         }
         System.out.printf("\n");
     */
+    /* **************************************************** */
+    System.out.printf("%36s\n", "write_1 Test");
+    System.out.printf("%s\n", H2);
+    BS.reset(); // lol I lied
+
+    boolean verifOut;
+    ByteBuffer tmpBuff0 = ByteBuffer.allocate((int) (BS.getLength() / 2));
+
+    System.out.printf("Writing [0 - %d] bytes into w1_0_j.tmp\n", (int) (BS.getLength() / 2));
+    FileOutputStream fcOut1_0 = new FileOutputStream("../files/w1_0_j.tmp");
+    BS.write(fcOut1_0, 0, BS.getLength() / 2);
+    fcOut1_0.close();
+
+    System.out.printf("Checking integrity -> w1_0_j.tmp\n");
+    FileChannel fcIn1_0 = FileChannel.open(FileSystems.getDefault()
+        .getPath("../files/w1_0_j.tmp"), StandardOpenOption.READ);
+    fcIn1_0.read(tmpBuff0, 0);
+    verifOut = true;
+    for (int i = 0; i < (int) (BS.getLength() / 2) && verifOut; ++i) {
+      verifOut = BS.getByteStream()[i] == tmpBuff0.array()[i];
+    }
+    System.out.printf("Result: %s\n", verifOut ? "OK" : "Error");
+    fcIn1_0.close();
+    System.out.printf("%s\n", H2);
+    System.out.printf("%s\n", H1);
+    /* **************************************************** */
+    System.out.printf("%36s\n", "write_0 Test");
+    System.out.printf("%s\n", H2);
+    BS.reset(); // lol I lied
+    ByteBuffer tmpBuff2 = ByteBuffer.allocate((int) BS.getLength());
+
+    System.out.printf("Writing everything into w0_j.tmp\n");
+    FileOutputStream fcOut0 = new FileOutputStream("../files/w0_j.tmp");
+    BS.write(fcOut0);
+    fcOut0.close();
+
+    System.out.printf("Checking integrity -> w0_j.tmp\n");
+    FileChannel fcIn0 = FileChannel.open(FileSystems.getDefault()
+        .getPath("../files/w0_j.tmp"), StandardOpenOption.READ);
+    fcIn0.read(tmpBuff2, 0);
+    verifOut = true;
+    for (int i = 0; i < BS.getLength() && verifOut; ++i) {
+      verifOut = BS.getByteStream()[i] == tmpBuff2.array()[i];
+    }
+    System.out.printf("Result: %s\n", verifOut ? "OK" : "Error");
+    fcIn0.close();
+
+    System.out.printf("%s\n", H1);
     /* **************************************************** */
   }
 }

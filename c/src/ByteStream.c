@@ -6,7 +6,7 @@
 #include <string.h>
 
 #ifndef BS_HH
-#include "ByteStream.h"
+    #include "ByteStream.h"
 #endif
 
 ByteStream *ByteStreamInit() {
@@ -24,9 +24,11 @@ struct BS_s BS_default = {                  // Default values for initial "insta
   -1,                             // readFileNumSegments
   {NULL, 0},                      // readFileSegments
   -1,                             // temporalFilePosition
-  '\0',                           // temporalFileName
+  NULL,                           // temporalFileName
   {NULL, 0}                       // temporalBuffer
-  // NULL               // lock
+  #ifdef _OPENMP
+    , NULL                        // lock
+  #endif
 };
 
 /**
@@ -346,6 +348,34 @@ void skip(ByteStream *object, long numBytes) {
 }
 
 /**
+ * Ends the readFile mode putting all segments of the file in the real byte buffer,
+ * entering in the normal mode. This stream can return to the readFile mode
+ * calling <code>returnReadFileMode</code>.
+ *
+ * @throws IOException when some problem reading the file occurs
+ */
+void endReadFileMode(ByteStream *object) {
+  assert(object->streamMode == 1);
+
+  object->buffer.array = malloc((int) object->limit);
+  object->buffer.length = object->limit;
+  int readBytes = 0;
+  for(int segment = 0; segment < object->readFileNumSegments; segment++){
+    long begin = object->readFileSegments.array[segment][0];
+    long length = object->readFileSegments.array[segment][1];
+
+    object->temporalBuffer.array = malloc((int) length);
+    object->temporalBuffer.length = length;
+
+    fcRead(object->readFileChannel, object->temporalBuffer, begin);
+    memcpy(object->buffer.array + readBytes, object->temporalBuffer.array, (int) length);
+
+    readBytes += length;
+  }
+  object->streamMode = 0;
+}
+
+/**
  * Returns a stream that was created in readFile mode and that was converted to the normal
  * mode afterwards to the readFile mode again. Attention! Be aware that once this function
  * is called, the stream returns to the state left when the function <code>endReadFileMode</code> was
@@ -417,6 +447,48 @@ int isInTemporalFile(ByteStream *object) {
 }
 
 /**
+ * Writes the stream to a file. This function can only be called when the stream is in
+ * normal or readFile mode.
+ *
+ * @param fos file in which is written
+ * @throws IOException when some error writing in the file occurs
+ */
+void write_0(ByteStream *object, FileChannel fc) {
+  assert((object->streamMode == 0) || (object->streamMode == 2));
+  write_1(object, fc, 0, object->limit);
+}
+
+/**
+ * Writes a segment of the stream to a file. This function can only be called when the
+ * stream is in normal or readFile mode.
+ *
+ * @param fos file in which is written
+ * @param begin first byte of the stream written
+ * @param length length written
+ * @throws IOException when some error writing in the file occurs
+ */
+void write_1(ByteStream *object, FileChannel outputFC, long begin, long length) {
+  assert((object->streamMode == 0) || (object->streamMode == 2));
+  assert(begin + length <= object->limit);
+  if(!isInTemporalFile(object)) {
+    fcWrite(outputFC, object->buffer, begin, length);
+  } else {
+    FileChannel streamFC = FileChannel_0(object->temporalFileName, "r");
+
+    long bytesWritten = 0;
+    long positionOutputFC = fcGetPosition(outputFC);
+    fcPosition(streamFC, begin + object->temporalFilePosition);
+    while(bytesWritten < length) {
+      bytesWritten += fcTransferFrom(outputFC, streamFC, positionOutputFC, length - bytesWritten);
+      positionOutputFC += bytesWritten;
+      fcPosition(streamFC, begin + object->temporalFilePosition + bytesWritten);
+    }
+    fcPosition(outputFC, positionOutputFC);
+    fcClose(streamFC);
+  }
+}
+
+/**
  * Saves the stream to a file and frees allocated memory. Before using the stream again,
  * the function <code>loadFromTemporalFile</code> must be called. This function can only be
  * called when the stream is in normal mode.
@@ -429,7 +501,9 @@ void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
   int num = 0;
   int verif = temporalDirectory[strlen(temporalDirectory) - 1] == '/';
 
-  // omp_set_lock(lock);
+  #ifdef _OPENMP
+  omp_set_lock(object->lock);
+  #endif
 
   //Checks whether is the first time an object of this class is saved to the temporal file
   if(object->temporalFileName == NULL) {
@@ -440,12 +514,15 @@ void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
     } while(!access(object->temporalFileName, F_OK));
   }
 
-  FileChannel fc = fcConfig(object->temporalFileName, "w");
+  FileChannel fc = FileChannel_0(object->temporalFileName, "w");
+
   object->temporalFilePosition = fcGetPosition(fc);
-  fcWrite(fc, object->buffer);
+  fcWrite(fc, object->buffer, 0, object->buffer.length);
   fcClose(fc);
 
-  // omp_unset_lock(object->lock);
+  #ifdef _OPENMP
+  omp_unset_lock(object->lock);
+  #endif
 
   free(object->buffer.array);
   object->streamMode = 2;
@@ -463,7 +540,8 @@ void loadFromTemporalFile(ByteStream *object) {
   object->buffer.array = (unsigned char *) malloc((int) object->limit);
   object->buffer.length = object->limit;
 
-  FileChannel fc = fcConfig(object->temporalFileName, "r");
+  FileChannel fc = FileChannel_0(object->temporalFileName, "r");
+
   fcPosition(fc, object->temporalFilePosition);
   fcRead(fc, object->buffer, 0);
   fcClose(fc);
@@ -478,6 +556,7 @@ void loadFromTemporalFile(ByteStream *object) {
 void destroy(ByteStream *object) {
   free(object->buffer.array);
   free(object->readFileSegments.array);
+  if(object->streamMode == 2) fcClose(object->readFileChannel);
 }
 
 /**

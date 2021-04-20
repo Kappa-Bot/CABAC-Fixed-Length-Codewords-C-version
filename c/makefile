@@ -1,14 +1,16 @@
-CCFLAGS = -Wall -O3 -lm -DNDEBUG
+CCFLAGS = -Wall -O3 -lm -DNDEBUG -fopenmp
 
 CC = gcc
 
 default: compile
 
-#src/%.o : src/%.c
+# SRC src/%.o : src/%.c
 #	$(CC) $(CCFLAGS) -o src/$< -o src/$@
 
-#util/%.o : util/%.c
+# UTIL util/%.o : util/%.c
 #	$(CC) $(CCFLAGS) -o util/$< -o util/$@
+
+.PHONY: ACFLW BS FC SG SC ACT BST FCT SGT SCT compile clean
 
 ACFLW src/ArithmeticCoderFLW.o : src/ArithmeticCoderFLW.c src/ArithmeticCoderFLW.h
 	$(CC) $(CCFLAGS) -c src/ArithmeticCoderFLW.c -o src/ArithmeticCoderFLW.o

@@ -1,7 +1,10 @@
 #ifndef BS_HH
 #define BS_HH
 
-#include <omp.h>
+// Won't include the library if not compiled with "-fopenmp"
+#ifdef _OPENMP
+    #include <omp.h>
+#endif
 
 #ifndef FC_HH
 #include "FileChannel.h"
@@ -11,17 +14,19 @@
 #define INITIAL_NUM_SEGMENTS 32
 
 extern struct BS_s {
-  int streamMode;                 // 0/1/2 <-> normal/readFile/temporalFile
-  ByteBuffer buffer;               // Array in which the bytes are stored
-  long limit;                     // X != 0
-  long position;                  // position <= limit
-  FileChannel readFileChannel;   // Only for readFile mode
-  int readFileNumSegments;        // 0 < X
-  SegmentsArray readFileSegments; // The indices are [segment][0- first byte, 1- length]
-  long temporalFilePosition;      // Only for temporalFile mode
-  char *temporalFileName;         // File name in which the stream is saved temporarily
-  ByteBuffer temporalBuffer;       // Only for readFile mode
-  // omp_lock_t lock;                // For lock access shared by multiple threads
+  int streamMode;                     // 0/1/2 <-> normal/readFile/temporalFile
+  ByteBuffer buffer;                  // Array in which the bytes are stored
+  long limit;                         // X != 0
+  long position;                      // position <= limit
+  FileChannel readFileChannel;        // Only for readFile mode
+  int readFileNumSegments;            // 0 < X
+  SegmentsArray readFileSegments;     // The indices are [segment][0- first byte, 1- length]
+  long temporalFilePosition;          // Only for temporalFile mode
+  char *temporalFileName;             // File name in which the stream is saved temporarily
+  ByteBuffer temporalBuffer;          // Only for readFile mode
+  #ifdef _OPENMP
+      omp_lock_t *lock;                // For lock access shared by multiple threads
+  #endif
 } BS_default;
 
 /**
@@ -60,7 +65,7 @@ extern void clear(ByteStream *object);                             // No test ne
 extern void ByteStream_reset(ByteStream *object);                  // No test needed
 extern void skip(ByteStream *object, long numBytes);
 
-// void endReadFileMode(ByteStream *object);
+extern void endReadFileMode(ByteStream *object);
 extern void returnReadFileMode(ByteStream *object);
 
 extern void packetize(ByteStream *object);
@@ -69,8 +74,8 @@ extern int isInReadNormalMode(ByteStream *object);                 // No test ne
 extern int isInReadFileMode(ByteStream *object);                   // No test needed
 extern int isInTemporalFile(ByteStream *object);                   // No test needed
 
-// void write_0(ByteStream *object, FileOutputStream fos); // Need to implement FileOutputStream
-// void write_1(ByteStream *object, FileOutputStream fos, long begin, long length);
+extern void write_0(ByteStream *object, FileChannel fc); // Need to implement FileOutputStream
+extern void write_1(ByteStream *object, FileChannel fc, long begin, long length);
 
 extern void saveToTemporalFile(ByteStream *object, char *temporalDirectory);
 extern void loadFromTemporalFile(ByteStream *object);

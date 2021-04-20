@@ -26,6 +26,7 @@ int main() {
     16
   };
   unsigned char *ptr;
+  char *ptr2;
   int verif;
 
   printf("%s\n", H1);
@@ -40,7 +41,7 @@ int main() {
       putByte(BS, 1); // [0 - 255], overflow not allowed
       verif = ptr == BS->buffer.array;
     }
-    printf("old: %p\tnew: %p\tlength: %d\n",
+    printf("old: %p\tnew: %p\tlength: %ld\n",
       ptr, BS->buffer.array, BS->buffer.length);
   }
   printf("%s\n", H2);
@@ -61,7 +62,7 @@ int main() {
       putBytes_0(BS, arr, 0, 16); // Whole array, sequences of [0-16]
       verif = ptr == BS->buffer.array;
     }
-    printf("old: %p\tnew: %p\tlength: %d\n",
+    printf("old: %p\tnew: %p\tlength: %ld\n",
       ptr, BS->buffer.array, BS->buffer.length);
   }
   printf("%s\n", H2);
@@ -82,7 +83,7 @@ int main() {
       putBytes_1(BS, 2147483647, 256); // Max 4B value
       verif = ptr == BS->buffer.array;
     }
-    printf("old: %p\tnew: %p\tlength: %d\n",
+    printf("old: %p\tnew: %p\tlength: %ld\n",
       ptr, BS->buffer.array, BS->buffer.length);
   }
   printf("%s\n", H2);
@@ -128,7 +129,7 @@ int main() {
   printf("%36s\n", "getBytes Test (normal mode)");
   printf("%s\n", H2);
   ByteStream_reset(BS); // lol I lied
-  char *ptr2 = (char *)BS->buffer.array;
+  ptr2 = (char *)BS->buffer.array;
 
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", getBytes(BS, 1), pack4B(ptr2[0], 0, 0, 0));
   printf("%s\n", H2);
@@ -172,6 +173,54 @@ int main() {
       }
       printf("\n");
   */
+  /* **************************************************** */
+  printf("%36s\n", "write_1 Test");
+  printf("%s\n", H2);
+  ByteStream_reset(BS); // lol I lied
+
+  int verifOut;
+  ByteBuffer tmpBuff0 = {malloc(getLength(BS) / 2), getLength(BS) / 2};
+
+  printf("Writing [0 - %ld] bytes into w1_0_c.tmp\n", getLength(BS) / 2);
+  FileChannel fcOut1_0 = FileChannel_0("../../files/w1_0_c.tmp", "w");
+  write_1(BS, fcOut1_0, 0, getLength(BS) / 2);
+  fcClose(fcOut1_0);
+
+  printf("Checking integrity -> w1_0_c.tmp\n");
+  FileChannel fcIn1_0 = FileChannel_0("../../files/w1_0_c.tmp", "r");
+  fcRead(fcIn1_0, tmpBuff0, 0);
+  verifOut = 1;
+  for (long i = 0; i < getLength(BS) / 2 && verifOut; ++i) {
+    verifOut = ptr[i] == tmpBuff0.array[i];
+  }
+  printf("Result: %s\n", verifOut ? "OK" : "Error");
+  fcClose(fcIn1_0);
+  free(tmpBuff0.array);
+  printf("%s\n", H2);
+  printf("%s\n", H1);
+  /* **************************************************** */
+  printf("%36s\n", "write_0 Test");
+  printf("%s\n", H2);
+  ByteStream_reset(BS); // lol I lied
+  ByteBuffer tmpBuff2 = {malloc(getLength(BS)), getLength(BS)};
+
+  printf("Writing everything into w0_c.tmp\n");
+  FileChannel fcOut0 = FileChannel_0("../../files/w0_c.tmp", "w");
+  write_0(BS, fcOut0);
+
+  printf("Checking integrity -> w0_c.tmp\n");
+  FileChannel fcIn0 = FileChannel_0("../../files/w0_c.tmp", "r");
+  fcRead(fcIn0, tmpBuff2, 0);
+  verifOut = 1;
+  for (long i = 0; i < getLength(BS) && verifOut; ++i) {
+    verifOut = ptr[i] == tmpBuff2.array[i];
+  }
+  printf("Result: %s\n", verifOut ? "OK" : "Error");
+  fcClose(fcIn0);
+  free(tmpBuff2.array);
+
+  fcClose(fcOut0);
+  printf("%s\n", H1);
   /* **************************************************** */
 
   destroy(BS);
