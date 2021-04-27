@@ -121,14 +121,14 @@ public final class ByteStream{
 	 * <p>
 	 * Negative values not allowed.
 	 */
-	private int readFileNumSegments = -1;
+	public int readFileNumSegments = -1;
 
 	/**
 	 * Segments of the stream within the file, employed when the stream is in readFile mode.
 	 * <p>
 	 * The indices of the array are [segment][0- first byte, 1- length].
 	 */
-	private long[][] readFileSegments = null;
+	public long[][] readFileSegments = null;
 
 	/**
 	 * Position of this stream in the temporal file in which the data are saved. This is only
@@ -143,7 +143,7 @@ public final class ByteStream{
 	 * <p>
 	 * It is set in the <code>saveToTemporalFile</code> function.
 	 */
-	private static String temporalFileName = null;
+	public static String temporalFileName = null;
 
 	/**
 	 * Temporal ByteBuffer employed to read from the file channel when necessary (only used when

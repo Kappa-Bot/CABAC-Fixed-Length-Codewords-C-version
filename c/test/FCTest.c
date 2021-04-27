@@ -48,7 +48,7 @@ int main() {
 
   printf("Reading 6 bytes from position 0\nGot:      | ");
   fcPosition(FC1, 0);
-  ByteBuffer BB = { (unsigned char *) malloc(after), size / 2};
+  ByteBuffer BB = { (char *) malloc(after), size / 2};
   fcRead(FC1, BB, 0);
   for (int i = 0; i < size / 2; i++) {
     printf("%d | ", (int) BB.array[i]);

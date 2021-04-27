@@ -26,9 +26,7 @@ struct BS_s BS_default = {                  // Default values for initial "insta
   -1,                             // temporalFilePosition
   NULL,                           // temporalFileName
   {NULL, 0}                       // temporalBuffer
-  #ifdef _OPENMP
-    , NULL                        // lock
-  #endif
+                                  // lock (no need to initialize here)
 };
 
 /**
@@ -36,9 +34,12 @@ struct BS_s BS_default = {                  // Default values for initial "insta
  */
 ByteStream *ByteStream_0() {
   ByteStream *object = ByteStreamInit();
-  object->buffer.array = (unsigned char *) malloc(INITIAL_ALLOCATION);
+  object->buffer.array = (char *) malloc(INITIAL_ALLOCATION);
   object->buffer.length = INITIAL_ALLOCATION;
   object->streamMode = 0;
+  #ifdef _OPENMP
+    omp_init_lock(&object->lock);
+  #endif
   return object;
 }
 
@@ -49,7 +50,7 @@ ByteStream *ByteStream_0() {
  */
 ByteStream *ByteStream_1(int initialAllocation) {
   ByteStream *object = ByteStreamInit();
-  object->buffer.array = (unsigned char *) malloc(initialAllocation);
+  object->buffer.array = (char *) malloc(initialAllocation);
   object->buffer.length = initialAllocation;
   object->streamMode = 0;
   return object;
@@ -63,10 +64,18 @@ ByteStream *ByteStream_1(int initialAllocation) {
  */
 ByteStream *ByteStream_2(FileChannel fc) {
   ByteStream *object = ByteStreamInit();
+  object->temporalBuffer.array = (char *) malloc(1);
+  object->temporalBuffer.length = 1;
   object->readFileChannel = fc;
   object->readFileNumSegments = 0;
-  object->readFileSegments.array = (long **) malloc(INITIAL_NUM_SEGMENTS * 2 * sizeof(long));
-  object->readFileSegments.length = INITIAL_NUM_SEGMENTS * 2;
+  // object->readFileSegments.array = (long **) malloc(INITIAL_NUM_SEGMENTS * 2 * sizeof(long));
+
+  object->readFileSegments.array = (long **) malloc(INITIAL_NUM_SEGMENTS * sizeof(long *));
+  object->readFileSegments.length = INITIAL_NUM_SEGMENTS;
+  for (int i = 0; i < INITIAL_NUM_SEGMENTS; ++i) {
+    object->readFileSegments.array[i] = (long *) malloc(2 * sizeof(long));
+  }
+
   object->streamMode = 1;
   return object;
 }
@@ -77,16 +86,16 @@ ByteStream *ByteStream_2(FileChannel fc) {
  *
  * @param b the added byte
  */
-void putByte(ByteStream *object, unsigned char b) {
+void putByte(ByteStream *object, char b) {
   assert(object->streamMode == 0);
   if(object->limit == object->buffer.length) {
-    unsigned char *bufferTMP = (unsigned char *) malloc(object->buffer.length * 2);
+    char *bufferTMP = (char *) malloc(object->buffer.length * 2);
     memcpy(bufferTMP, object->buffer.array, object->limit);
     free(object->buffer.array);
     object->buffer.array = bufferTMP;
 
-    // Optimization: reduces memory paging and cloning
-    // object->buffer.array = (unsigned char *) realloc(object->buffer.array, object->buffer.length * 2);
+    // Optimization: reduces memory paging and copying
+    // object->buffer.array = realloc(object->buffer.array, object->buffer.length * 2);
 
     object->buffer.length = object->buffer.length * 2;
   }
@@ -106,13 +115,13 @@ void putBytes_0(ByteStream *object, ByteBuffer array, int offset, int length) {
   assert(object->streamMode == 0);
   assert((offset >= 0) && (length > 0) && (offset + length <= array.length));
   if(object->limit + (long) length > (long) object->buffer.length) {
-    unsigned char *bufferTMP = (unsigned char*) malloc((object->buffer.length + length) * 2);
+    char *bufferTMP = (char*) malloc((object->buffer.length + length) * 2);
     memcpy(bufferTMP, object->buffer.array, (int) object->limit);
     free(object->buffer.array);
     object->buffer.array = bufferTMP;
 
     // Optimization: reduces memory paging and cloning
-    // object->buffer.array = (unsigned char *) realloc(object->buffer.array, (object->buffer.length + length) * 2);
+    // object->buffer.array = realloc(object->buffer.array, (object->buffer.length + length) * 2);
     object->buffer.length = (object->buffer.length + length) * 2;
   }
   memcpy(object->buffer.array + object->limit, array.array + offset, length);
@@ -130,7 +139,7 @@ void putBytes_1(ByteStream *object, int num, int numBytes) {
   assert(object->streamMode == 0);
   assert((numBytes > 0) && (numBytes <= 4));
   for(int b = numBytes - 1; b >= 0; b--) {
-    unsigned char addedByte = (unsigned char) ((num >> (8 * b)) & 0x000000FF);
+    char addedByte = (char) ((num >> (8 * b)) & 0x000000FF);
     putByte(object, addedByte);
   }
 }
@@ -147,19 +156,23 @@ void putFileSegment(ByteStream *object, long begin, long length) {
   assert(object->streamMode == 1);
   assert(object->readFileChannel != NULL);
   assert((begin >= 0) && (length > 0));
-  assert(begin + length <= object->readFileChannel.size);
+  assert(begin + length <= fcSize(object->readFileChannel));
   assert(object->readFileNumSegments <= object->readFileSegments.length);
 
   if(object->readFileNumSegments == object->readFileSegments.length) {
     long** fcSegmentsTMP = (long **) malloc
-        (object->readFileSegments.length * 2 * 2 * sizeof(long));
+            (object->readFileSegments.length * 2 * 2 * sizeof(long));
     for(int segment = 0; segment < object->readFileNumSegments; segment++) {
       fcSegmentsTMP[segment][0] = object->readFileSegments.array[segment][0];
       fcSegmentsTMP[segment][1] = object->readFileSegments.array[segment][1];
     }
-    free(fcSegmentsTMP);
-  }
+    //free(fcSegmentsTMP);
 
+    // Temporal code
+    free(object->readFileSegments.array);
+    object->readFileSegments.array = fcSegmentsTMP;
+    object->readFileSegments.length = object->readFileSegments.length * 2;
+  }
   object->readFileSegments.array[object->readFileNumSegments][0] = begin;
   object->readFileSegments.array[object->readFileNumSegments][1] = length;
   object->readFileNumSegments++;
@@ -201,11 +214,11 @@ void removeBytes(ByteStream *object, int num) {
  * @return the corresponding byte
  * @throws Exception when the end of the stream is reached
  */
-unsigned char getByte_0(ByteStream *object) {
+char getByte_0(ByteStream *object) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
   assert(object->position >= 0);
 
-  unsigned char getByte = getByte_1(object, object->position);
+  char getByte = getByte_1(object, object->position);
   object->position++;
   return(getByte);
 }
@@ -218,11 +231,11 @@ unsigned char getByte_0(ByteStream *object) {
  * @return the corresponding byte
  * @throws Exception when the indicated index is not valid
  */
-unsigned char getByte_1(ByteStream *object, long index) {
+char getByte_1(ByteStream *object, long index) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
   assert(index < 0 || index >= object->limit);
 
-  unsigned char getByte = 0;
+  char getByte = 0;
   if(object->streamMode == 0) {
     getByte = object->buffer.array[(int) index];
   } else if(object->streamMode == 1) {
@@ -234,17 +247,14 @@ unsigned char getByte_1(ByteStream *object, long index) {
       segment++;
     }
     assert(segment < object->readFileNumSegments);
-
     //Determines the position in the file
     long fcPosition = index - accBytes
                 + object->readFileSegments.array[segment][0];
     assert(fcPosition < fcSize(object->readFileChannel));
 
     //Gets the byte
-    fcRead(object->readFileChannel, object->temporalBuffer, fcPosition);
+    fcRead1B(object->readFileChannel, object->temporalBuffer, fcPosition);
     getByte = object->temporalBuffer.array[0];
-  } else {
-    assert(1 == 0);
   }
   return(getByte);
 }
@@ -261,7 +271,7 @@ int getBytes(ByteStream *object, int numBytes) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
   int num = 0;
   for(int b = numBytes - 1; b >= 0; b--) {
-    unsigned char getByte = getByte_0(object);
+    char getByte = getByte_0(object);
     for(int i = 7; i >= 0; i--) {
       int bitMask = 1 << i;
       num += ((int) getByte & bitMask) << (b * 8);
@@ -384,17 +394,16 @@ void endReadFileMode(ByteStream *object) {
  */
 void returnReadFileMode(ByteStream *object) {
   assert(object->streamMode == 0);
-  assert(object->readFileChannel.descriptor != -1);
+  assert(object->readFileChannel.file != NULL);
   assert(object->readFileNumSegments != -1);
   assert(object->readFileSegments.array != NULL);
 
   free(object->buffer.array);
-  object->buffer.array = NULL;
   object->buffer.length = 0;
-
   object->limit = 0;
+
   for(int segment = 0; segment < object->readFileNumSegments; segment++) {
-    object->limit += (long) ((int) object->readFileSegments.array[segment][1]);
+    object->limit += object->readFileSegments.array[segment][1];
   }
   if(object->position >= object->limit) {
     object->position = object->limit -1;
@@ -409,14 +418,14 @@ void returnReadFileMode(ByteStream *object) {
 void packetize(ByteStream *object) {
   assert(object->streamMode == 0);
 
-  unsigned char *bufferTMP = (unsigned char *) malloc(object->limit);
+  char *bufferTMP = (char *) malloc(object->limit);
   memcpy(bufferTMP, object->buffer.array, object->limit);
   free(object->buffer.array);
 
   // Optimization (cold-operation): reduces memory and paging operations
-  // object->buffer.array = (unsigned char *)
-  //             realloc (object->buffer.array, object->limit);
+  // object->buffer.array = realloc (object->buffer.array, object->limit);
   object->buffer.array = bufferTMP;
+  object->buffer.length = object->limit;
 }
 
 /**
@@ -498,33 +507,38 @@ void write_1(ByteStream *object, FileChannel outputFC, long begin, long length) 
  */
 void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
   assert(object->streamMode == 0);
-  int num = 0;
+
   int verif = temporalDirectory[strlen(temporalDirectory) - 1] == '/';
 
   #ifdef _OPENMP
-  omp_set_lock(object->lock);
+  omp_set_lock(&object->lock);
   #endif
 
   //Checks whether is the first time an object of this class is saved to the temporal file
   if(object->temporalFileName == NULL) {
+    // This size because... Why not
+    object->temporalFileName = (char *) malloc(strlen(temporalDirectory) + 21 + verif);
+    // TMP-728858622658.tmp
     do {
-      sprintf(object->temporalFileName, "%s%s%d.tmp",
-          temporalDirectory, verif ? "/TMP-" : "TMP-", num);
-      num += 1;
+      //memset(object->temporalFileName, 0, strlen(object->temporalFileName));
+      sprintf(object->temporalFileName, "%s%s%012d.tmp",
+          temporalDirectory, verif ? "/TMP-" : "TMP-", rand());
     } while(!access(object->temporalFileName, F_OK));
   }
 
   FileChannel fc = FileChannel_0(object->temporalFileName, "w");
 
   object->temporalFilePosition = fcGetPosition(fc);
-  fcWrite(fc, object->buffer, 0, object->buffer.length);
+  fcWrite(fc, object->buffer, 0, object->limit);
   fcClose(fc);
 
   #ifdef _OPENMP
-  omp_unset_lock(object->lock);
+  omp_unset_lock(&object->lock);
   #endif
 
   free(object->buffer.array);
+  object->buffer.length = -1; // Useful for destroy()
+
   object->streamMode = 2;
 }
 
@@ -537,7 +551,7 @@ void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
 void loadFromTemporalFile(ByteStream *object) {
   assert(object->streamMode == 2);
 
-  object->buffer.array = (unsigned char *) malloc((int) object->limit);
+  object->buffer.array = malloc((int) object->limit);
   object->buffer.length = object->limit;
 
   FileChannel fc = FileChannel_0(object->temporalFileName, "r");
@@ -554,9 +568,20 @@ void loadFromTemporalFile(ByteStream *object) {
  * longer needed.
  */
 void destroy(ByteStream *object) {
-  free(object->buffer.array);
-  free(object->readFileSegments.array);
-  if(object->streamMode == 2) fcClose(object->readFileChannel);
+  if(object->buffer.length > 0) { // normal | (readFile + end() + save() + load())
+    free(object->buffer.array);
+  }
+  if(object->streamMode == 1) { // readFile
+    //free(object->temporalBuffer.array);
+    for(int i = 0; i < object->readFileSegments.length; ++i) {
+      //free(object->readFileSegments.array[i]);
+    }
+    // free(object->readFileSegments.array);
+    // fcClose(object->readFileChannel);
+  }
+  #ifdef _OPENMP
+    omp_destroy_lock(&object->lock);
+  #endif
 }
 
 /**
@@ -567,8 +592,9 @@ void destroy(ByteStream *object) {
  */
 void destroyTemporalFile(ByteStream *object) {
   if(object->temporalFileName != NULL) {
-    assert(remove(object->temporalFileName));
-    object->temporalFileName = NULL;
+    int verif = remove(object->temporalFileName);
+    assert(verif == 0);
+    if (verif == 0) object->temporalFileName = NULL;
   }
 }
 
@@ -580,8 +606,10 @@ void destroyTemporalFile(ByteStream *object) {
  */
 int getMemorySegments(ByteStream *object) {
   int memory = 0;
-  if(object->streamMode == 0) {
-    memory = object->readFileSegments.length * 2 * (sizeof(long) / 8);
+  // if(object->streamMode == 0) {
+  // Temporal Code
+  if(object->streamMode == 1) {
+    memory = object->readFileSegments.length * 2 * sizeof(long);
   }
   return(memory);
 }

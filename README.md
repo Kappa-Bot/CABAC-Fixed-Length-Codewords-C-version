@@ -3,45 +3,32 @@ This is a transcription from an implementation of an Arithmetic Coder from Java 
 This work aims to get a version of the resources in C, keeping an enough-equivalent compression behaviour, attempting to obtain a significantly-improved performance for this system.
 
 ## Transcription
-  - [X] ArithmeticCoderFLW    -> 100% developed and 100% tested
-  - [X] ByteStream            -> 100% developed and  62% tested
-  - [X] FileChannel           -> 100% developed and 100% tested
-  - [X] ByteBuffer            -> (Structure)
+  - [X] ArithmeticCoderFLW
+  - [X] ByteStream
+  - [X] FileChannel
+  - [X] Structures (ByteBuffer, FileSegments)
 ## Software Testing
   - [X] Streams checker (C)
   - [X] Streams generator (Both versions, but C > Java)
-### Core Functions Progress
-#### ArithmeticCoderFLW
-  - [X] probToFLW
-  - [X] FLWToProb
-  - [x] transferInterval      // Implicit
-  - [x] fillInterval          // Implicit
-  - [X] encodeInteger
-  - [X] encodeBit
-  - [X] encodebitProb
-  - [X] encodebitContext
-  - [X] decodeInteger
-  - [X] decodeBit
-  - [X] decodebitProb
-  - [X] decodebitContext
-  - [X] terminate
-#### ByteStream
-  - [X] putByte
-  - [X] putBytes
-  - [X] getByte               // Missing readFile mode test
-  - [X] getBytes              // Missing readFile mode test
+  - [X] ArithmeticCoderFLW
+  - [X] ByteStream - normal
+  - [X] ByteStream - readFile
+  - [X] ByteStream - temporalFile
+  - [X] FileChannel
+  - [ ] Full System coding/decoding
+## Profiling (Raspberry Pi 4 8GB - Raspbian)
+### ArithmeticCoderFLW + ByteStream (normal)
+  - [ ] encodeBit
+  - [ ] putByte
+  - [ ] putBytes
+  - [ ] decodeBit
+  - [ ] getByte
+  - [ ] ...
+### ArithmeticCoderFLW + ByteStream (readFile)
   - [ ] putFileSegment
-  - [ ] saveToTemporalFile
-  - [ ] loadFromTemporalFile
-  - [X] write                 // Missing temporalFile mode test
-#### FileChannel
-  - [X] size
-  - [X] position
-  - [X] read
-  - [X] write
-  - [X] transferFrom
-### Profiling
-  - Coming soon...
+  - [ ] decodeBit
+  - [ ] getByte
+  - [ ] ...
 
 ## References
 <a id="1">[1]</a>
@@ -49,3 +36,12 @@ F. Aulí-Llinàs, “Context-Adaptive Binary Arithmetic Coding With Fixed-Length
 
 <a id="2">[2]</a>
 J. Gosling, B. Joy and G. Steele, “The Java Language Specification,” Menlo Park, Calif.,, 1996.
+
+<a id="3">[3]</a>
+“FileChannel (Java Platform SE 7)”, Docs.oracle, 2021. [Online]. Available: https://docs.oracle.com/javase/7/docs/api/java/nio /channels/FileChannel.html. [Accessed: 20-Apr-2021].
+
+<a id="4">[4]</a>
+“FileOutputStream (Java Platform SE 7)”, Oracle Docs, 2021. [Online]. Available: https://docs.oracle.com/javase/7/docs/api/java/io /FileOutputStream.html. [Accessed: 20-Apr-2021].
+
+<a id="5">[5]</a>
+“sendfile(2) [Redhat man page]”, Unix.com, 2021. [Online]. Available: https://www.unix.com/man-page/redhat/2/sendfile/. [Accessed: 21-Apr-2021].

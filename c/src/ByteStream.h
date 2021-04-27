@@ -25,7 +25,7 @@ extern struct BS_s {
   char *temporalFileName;             // File name in which the stream is saved temporarily
   ByteBuffer temporalBuffer;          // Only for readFile mode
   #ifdef _OPENMP
-      omp_lock_t *lock;                // For lock access shared by multiple threads
+      omp_lock_t lock;                // For lock access shared by multiple threads
   #endif
 } BS_default;
 
@@ -42,7 +42,7 @@ extern ByteStream *ByteStream_0();                                 // No test ne
 extern ByteStream *ByteStream_1(int initialAllocation);            // No test needed
 extern ByteStream *ByteStream_2(FileChannel fc);                   // No test needed
 
-extern void putByte(ByteStream *object, unsigned char b);          // Tested
+extern void putByte(ByteStream *object, char b);          // Tested
 extern void putBytes_0(ByteStream *object, ByteBuffer array,       // Tested
                 int offset, int length);
 extern void putBytes_1(ByteStream *object, int num, int numBytes); // Tested
@@ -52,8 +52,8 @@ extern void putFileSegment(ByteStream *object, long begin, long length);
 extern void removeByte(ByteStream *object);                        // No test needed
 extern void removeBytes(ByteStream *object, int num);              // No test needed
 
-extern unsigned char getByte_0(ByteStream *object);
-extern unsigned char getByte_1(ByteStream *object, long index);
+extern char getByte_0(ByteStream *object);
+extern char getByte_1(ByteStream *object, long index);
 extern int getBytes(ByteStream *object, int numBytes);
 
 extern int hasMoreBytes(ByteStream *object);                       // No test needed
@@ -84,4 +84,5 @@ extern void destroy(ByteStream *object);
 extern void destroyTemporalFile(ByteStream *object);
 extern int getMemorySegments(ByteStream *object);
 
+extern char *getTemporalFileName(ByteStream *object);
 #endif /* BS_HH */

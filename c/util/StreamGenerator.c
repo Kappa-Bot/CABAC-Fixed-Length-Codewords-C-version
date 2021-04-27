@@ -13,8 +13,8 @@ StreamGenerator sgConfig(char *path, char *ext) {
 
 void sgGenerate(StreamGenerator object, int fileSize, int count) {
   for (int i = 0; i < count; ++i) {
-    char tmpFileName[count];
-    sprintf(tmpFileName, "%s%d%s", object.path, i, object.extension);
+    char tmpFileName[count + 5];
+    sprintf(tmpFileName, "%ssg_%d%s", object.path, i, object.extension);
 
     FILE *tmpFile = fopen(tmpFileName, "w");
 
