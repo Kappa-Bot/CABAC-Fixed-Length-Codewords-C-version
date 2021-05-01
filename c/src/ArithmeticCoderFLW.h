@@ -9,18 +9,18 @@
 #define UPDATE_PROB0 7
 #define WINDOW_PROB 127
 
-extern const long BIT_MASKS[];
+extern const long long BIT_MASKS[];
 extern const int BIT_MASKS2[];
 
 extern struct ACFLW_s {
   int  codewordLength;  // 0 < X < 64
   int  precisionBits;   // 0 < X < 64, codewordLength + precisionBits < 64
-  long codewordMax;     // 2^codewordLength - 1
+  long long codewordMax;     // 2^codewordLength - 1
   int  codewordBytes;   // ceil(codewordLength / 8)
   int  precisionMid;    // 2^(precisionBits - 1)
-  long intervalMin;     // 0 < X < 2^codewordLength - 1
-  long intervalSize;    // 0 < interval - 1 < 2^codewordLength - 1
-  long interval;        // intervalMin <= X <= intervalMin + intervalSize
+  long long intervalMin;     // 0 < X < 2^codewordLength - 1
+  long long intervalSize;    // 0 < interval - 1 < 2^codewordLength - 1
+  long long interval;        // intervalMin <= X <= intervalMin + intervalSize
   int  Tr;              // Flushed byte to the stream
   int  t;               // Number of bits to transfer
   int  L;               // Current position in the stream

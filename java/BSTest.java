@@ -83,14 +83,14 @@ public class BSTest {
           while (verif) {
             /*
              * Just to remind the byte format of Java (same as C's signed char)
-             * UINT8    BYTE
-             *   1       1
-             *  127     127
-             *  128    -128 (0 from another alternative dimension, somehow)
-             *  129    -127
-             *  255     -1
+             * SIGNED CHAR    BYTE
+             *      1          1
+             *     127        127
+             *     128       -128 (0 from another alternative dimension, somehow)
+             *     129       -127
+             *     255        -1
              */
-            BS.putBytes(2147483647, 256); // Max 4B value
+             BS.putBytes(2147483647, 4); // Max 4B value
             verif = ptr == BS.getByteStream();
           }
           System.out.printf("old: %s  \tnew: %s  \tlength: %d\n",
@@ -337,6 +337,33 @@ public class BSTest {
         fcInTmp0.close();
         fcInTmp1.close();
 
+        System.out.printf("%s\n", H1);
+        /* **************************************************** */
+        System.out.printf("%36s\n", "write_0 (temporalFile mode) Test");
+        System.out.printf("%s\n", H2);
+
+        FileOutputStream FCTMP = new FileOutputStream("../files/wt_j.tmp");
+        BS2.write(FCTMP);
+        FCTMP.close();
+        System.out.printf("%s\n", H2);
+        System.out.printf("Checking integrity -> wt_j.tmp vs %s\n", BS2.temporalFileName);
+
+        FileChannel fcInTmp2 = FileChannel.open(FileSystems.getDefault()
+            .getPath("../files/w1_0_j.tmp"), StandardOpenOption.READ);
+        FileChannel fcInTmp3 = FileChannel.open(FileSystems.getDefault()
+            .getPath(BS2.temporalFileName), StandardOpenOption.READ);
+
+        ByteBuffer tmpBuffTmp2 = ByteBuffer.allocate((int) fcInTmp3.size());
+        ByteBuffer tmpBuffTmp3 = ByteBuffer.allocate((int) fcInTmp2.size());
+        fcInTmp2.read(tmpBuffTmp2, 0);
+        fcInTmp3.read(tmpBuffTmp3, 0);
+        verifOut = true;
+        for (int i = 0; i < BS2.getLength() / 2 && verifOut; ++i) {
+          verifOut = tmpBuffTmp2.array()[i] == tmpBuffTmp3.array()[i];
+        }
+        System.out.printf("Result: %s\n", verifOut ? "OK" : "Error");
+        fcInTmp2.close();
+        fcInTmp3.close();
         System.out.printf("%s\n", H1);
         /* **************************************************** */
         System.out.printf("%36s\n", "loadFromTemporalFile Test");

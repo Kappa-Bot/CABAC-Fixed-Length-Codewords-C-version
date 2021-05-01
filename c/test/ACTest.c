@@ -6,7 +6,7 @@
 
 #define H1 "**************************************************************************"
 #define H2 "__________________________________________________________________________"
-#define pack4B(a, b, c, d) *((int*) (char[4] ) {a, b, c, d} )
+#define pack4B(a, b, c, d) *((int*) (signed char[4] ) {a, b, c, d} )
 
 const float probSet[] = { 0.01f, 0.25f, 0.33f, 0.5f, 0.66f, 0.99f };
 const int precisionSet[] = { 2, 3, 8, 15, 17, 24 };
@@ -20,7 +20,7 @@ int main() {
   ArithmeticCoderFLW *ACFLW = ArithmeticCoderFLW_3(32, 15, 1);
   ByteStream *BS = ByteStream_0();
   changeStream(ACFLW, BS);
-  char *ptr = (char *)BS->buffer.array;
+  signed char *ptr = (signed char *)BS->buffer.array;
 
   printf("%s\n", H1);
   printf("%41s\n", "prob0ToFLW + FLWToProb0 Test");
@@ -110,43 +110,45 @@ int main() {
   printf("%42s\n", "terminate Test");
   printf("%s\n", H2);
 
-  printf("ByteStream buffer has currently %ld bytes, encoding another 5K bits (1..1)\n", BS->limit);
+  printf("ByteStream buffer has currently %lld bytes, encoding another 5K bits (1..1)\n", BS->limit);
   for (int i = 0; i < 5000; ++i) {
     encodeBit(ACFLW, 1);
   }
   printf("%s\n", H2);
-  printf("Terminating with %ld bytes on buffer\n", BS->limit);
+  printf("Terminating with %lld bytes on buffer\n", BS->limit);
   terminate(ACFLW);
-  printf("ByteStream limit  \t\tgot: %ld bytes\texpected: %d\n", BS->limit, 1354);
-  printf("ByteStream length \t\tgot: %ld bytes\texpected: %d\n", BS->buffer.length, 2048);
+  printf("ByteStream limit  \t\tgot: %lld bytes\texpected: %d\n", BS->limit, 687);
+  printf("ByteStream length \t\tgot: %lld bytes\texpected: %d\n", BS->buffer.length, 1024);
   printf("%s\n", H2);
-  printf("Terminating (again) with %ld bytes on buffer\n", BS->limit);
+  printf("Terminating (again) with %lld bytes on buffer\n", BS->limit);
   terminate(ACFLW);
-  printf("ByteStream limit  (again)\tgot: %-10ld bytes\texpected: %d\n", BS->limit, 1357);
-  printf("ByteStream length (again)\tgot: %-10ld bytes\texpected: %d\n", BS->buffer.length, 2048);
+  printf("ByteStream limit  (again)\tgot: %-10lld bytes\texpected: %d\n", BS->limit, 689);
+  printf("ByteStream length (again)\tgot: %-10lld bytes\texpected: %d\n", BS->buffer.length, 1024);
   printf("%s\n", H2);
-  printf("ByteStream buffer has currently %ld bytes, encoding another 1M bits (1..1)\n", BS->limit);
+  printf("ByteStream buffer has currently %lld bytes, encoding another 1M bits (1..1)\n", BS->limit);
   for (int i = 0; i < 1000000; ++i) {
     encodeBit(ACFLW, 1);
   }
   printf("%s\n", H2);
-  printf("Terminating with %ld bytes on buffer\n", BS->limit);
+  printf("Terminating with %lld bytes on buffer\n", BS->limit);
   terminate(ACFLW);
-  printf("ByteStream limit  \t\tgot: %-10ld bytes\texpected: %d\n", BS->limit, 10693);
-  printf("ByteStream length \t\tgot: %-10ld bytes\texpected: %d\n", BS->buffer.length, 16384);
+  printf("ByteStream limit  \t\tgot: %-10lld bytes\texpected: %d\n", BS->limit, 134024);
+  printf("ByteStream length \t\tgot: %-10lld bytes\texpected: %d\n", BS->buffer.length, 262144);
   printf("%s\n", H2);
   /* **************************************************** */
-  char *decodedBuffer = malloc(BS->limit);
+  restartDecoding(ACFLW);
+  signed char *decodedBuffer = (signed char *) malloc(BS->limit);
+  memset(decodedBuffer, 0, BS->limit);
   int idx = 0;
   /* **************************************************** */
   printf("%42s\n", "decodeBitProb Test");
   printf("%s\n", H2);
 
-  printf("Decoding 0-%d of %ld bytes\n", 3, BS->limit);
+  printf("Decoding 0-%d of %lld bytes\n", 3, BS->limit);
   for (int i = 1; i < 5; ++i) {
     for (int j = 7; j >= 0; --j) {
       int decodedAux = decodeBitProb(ACFLW, prob0ToFLW(probSet[i], 15)) == 1 ? 1 : 0;
-      decodedBuffer[idx] |= decodedAux << j;
+      decodedBuffer[idx] |= (decodedAux << j);
     }
     idx++;
   }

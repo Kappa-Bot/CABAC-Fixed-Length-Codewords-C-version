@@ -8,7 +8,7 @@
 #include "ArithmeticCoderFLW.h"
 #endif
 
-const long BIT_MASKS[] = {0x0, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
+const long long BIT_MASKS[] = {0x0, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
 const int BIT_MASKS2[] = {1, 1 << 1,  1 << 2,  1 << 3,  1 << 4,  1 << 5,  1 << 6, \
                              1 << 7,  1 << 8,  1 << 9,  1 << 10, 1 << 11, 1 << 12, \
                              1 << 13, 1 << 14, 1 << 15, 1 << 16, 1 << 17, 1 << 18, \
@@ -52,7 +52,7 @@ ArithmeticCoderFLW *ArithmeticCoderFLW_0() {
   assert(object->precisionBits > 0);
   assert(object->codewordLength + object->precisionBits < 64);
 
-  object->codewordMax = ((long) 1 << object->codewordLength) - 1;
+  object->codewordMax = ((long long) 1 << object->codewordLength) - 1;
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
   restartEncoding(object);
@@ -71,7 +71,7 @@ ArithmeticCoderFLW *ArithmeticCoderFLW_1(int codewordLength) {
   assert(object->codewordLength > 0);
   assert(object->precisionBits > 0);
   assert(object->codewordLength + object->precisionBits < 64);
-  object->codewordMax = ((long) 1 << object->codewordLength) - 1;
+  object->codewordMax = ((long long) 1 << object->codewordLength) - 1;
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
   restartEncoding(object);
@@ -92,7 +92,7 @@ ArithmeticCoderFLW *ArithmeticCoderFLW_2(int codewordLength, int precisionBits) 
   assert(object->codewordLength > 0);
   assert(object->precisionBits > 0);
   assert(object->codewordLength + object->precisionBits < 64);
-  object->codewordMax = ((long) 1 << object->codewordLength) - 1;
+  object->codewordMax = ((long long) 1 << object->codewordLength) - 1;
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
   restartEncoding(object);
@@ -118,7 +118,7 @@ ArithmeticCoderFLW *ArithmeticCoderFLW_3(int codewordLength,
   assert(object->precisionBits > 0);
   assert(object->numContexts > 0);
   assert(object->codewordLength + object->precisionBits < 64);
-  object->codewordMax = ((long) 1 << object->codewordLength) - 1;
+  object->codewordMax = ((long long) 1 << object->codewordLength) - 1;
   object->codewordBytes = (int) ceil((float) object->codewordLength / 8.f);
   object->precisionMid = 1 << (object->precisionBits - 1);
   object->contextProb0FLW = (int *) malloc(object->numContexts * sizeof(int));
@@ -143,7 +143,7 @@ ArithmeticCoderFLW *ArithmeticCoderFLW_3(int codewordLength,
 int prob0ToFLW(float prob0, int precisionBits) {
   assert((prob0 >= 0.f) && (prob0 <= 1.f));
 
-  int prob0FLW = (int) ((float) (1 << precisionBits) * prob0);
+  int prob0FLW = ((float) (1 << precisionBits) * prob0);
   if(prob0FLW == 0) {
     prob0FLW = 1;
   } else if(prob0FLW == (1 << precisionBits)) {
@@ -282,9 +282,9 @@ void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW){
   assert(object->intervalSize >= 1);
 
   if(bit == 0) {
-    object->intervalSize = ((long) prob0FLW * object->intervalSize) >> object->precisionBits;
+    object->intervalSize = ((long long) prob0FLW * object->intervalSize) >> object->precisionBits;
   } else {
-    long tmp = (((long) prob0FLW * object->intervalSize) >> object->precisionBits) + 1;
+    long long tmp = (((long long) prob0FLW * object->intervalSize) >> object->precisionBits) + 1;
     object->intervalMin += tmp;
     object->intervalSize -= tmp;
   }
@@ -314,8 +314,8 @@ int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW) {
   }
   assert(object->intervalSize >= 1);
 
-  long tmp = (((long) prob0FLW * object->intervalSize) >> object->precisionBits) + 1;
-  long mid = object->intervalMin + tmp;
+  long long tmp = (((long long) prob0FLW * object->intervalSize) >> object->precisionBits) + 1;
+  long long mid = object->intervalMin + tmp;
   int bit;
   if(object->interval >= mid) {
     bit = 1;
@@ -380,7 +380,7 @@ void transferInterval(ArithmeticCoderFLW *object, int length) {
 
     object->t -= transfer;
     if(object->t == 0) {
-      putByte(object->stream, (unsigned char) object->Tr);
+      putByte(object->stream, (signed char) object->Tr);
       if(object->Tr == 0xFF) {
         object->t = 7;
       } else {
@@ -429,9 +429,9 @@ void fillInterval(ArithmeticCoderFLW *object) {
     int read = remainingBits <= object->t? remainingBits: object->t;
 
     if((remainingBits - object->t) >= 0) {
-      object->interval |= ((long) object->Tr & BIT_MASKS[read]) << (remainingBits - object->t);
+      object->interval |= ((long long) object->Tr & BIT_MASKS[read]) << (remainingBits - object->t);
     } else {
-      object->interval |= ((long) object->Tr >> (object->t - remainingBits)) & BIT_MASKS[read];
+      object->interval |= ((long long) object->Tr >> (object->t - remainingBits)) & BIT_MASKS[read];
     }
     assert(object->interval >= 0 && object->interval <= object->codewordMax);
 
@@ -495,15 +495,15 @@ void restartDecoding(ArithmeticCoderFLW *object) {
  * @throws Exception when some problem manipulating the stream occurs
  */
 void terminate(ArithmeticCoderFLW *object) {
-  long interval1 = 0;
-  long interval2 = 0;
+  long long interval1 = 0;
+  long long interval2 = 0;
   int bits = object->codewordLength;
-  long intervalMax = object->intervalMin + object->intervalSize;
+  long long intervalMax = object->intervalMin + object->intervalSize;
   while(((interval1 < object->intervalMin) || (interval1 > intervalMax))
     && ((interval2 < object->intervalMin) || (interval2 > intervalMax))){
     bits--;
-    interval1 |= ((long) 1 << bits) & object->intervalMin;
-    interval2 |= ((long) 1 << bits) & intervalMax;
+    interval1 |= ((long long) 1 << bits) & object->intervalMin;
+    interval2 |= ((long long) 1 << bits) & intervalMax;
   }
 
   if((interval1 >= object->intervalMin) && (interval1 <= intervalMax)){
@@ -516,14 +516,14 @@ void terminate(ArithmeticCoderFLW *object) {
 
   transferInterval(object, object->codewordLength - bits);
   if(object->t != 8){
-    putByte(object->stream, (unsigned char) object->Tr);
+    putByte(object->stream, (signed char) object->Tr);
     object->Tr = 0;
     object->t = 8;
   }
 }
 
 /**
- * Computes the number of bytes belonging to the currently encoded data needed to flush
+ * Computes the number of bytes belong longing to the currently encoded data needed to flush
  * the internal registers (for encoding purposes). This function is useful to determine
  * potential truncation points of the stream.
  *

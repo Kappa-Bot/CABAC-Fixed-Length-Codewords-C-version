@@ -15,14 +15,14 @@ This work aims to get a version of the resources in C, keeping an enough-equival
   - [X] ByteStream - readFile
   - [X] ByteStream - temporalFile
   - [X] FileChannel
-  - [ ] Full System coding/decoding
+  - [ ] Full System coding/decoding     // ?????????? Assume it's correct
 ## Profiling (Raspberry Pi 4 8GB - Raspbian)
 ### ArithmeticCoderFLW + ByteStream (normal)
   - [ ] encodeBit
-  - [ ] putByte
-  - [ ] putBytes
+  - [X] putByte
+  - [X] putBytes
   - [ ] decodeBit
-  - [ ] getByte
+  - [X] getByte
   - [ ] ...
 ### ArithmeticCoderFLW + ByteStream (readFile)
   - [ ] putFileSegment

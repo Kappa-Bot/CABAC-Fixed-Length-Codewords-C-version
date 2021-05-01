@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #ifndef FC_HH
 #include "../src/FileChannel.h"
@@ -25,8 +26,8 @@ int main() {
   printf("%41s\n", "fcSize Test");
   printf("%s\n", H2);
   printf("Getting lenght of file 1\n");
-  long size = fcSize(FC1);
-  printf("File Size\t|\tgot: %-6ld\texpected: 13\n", size);
+  long long size = fcSize(&FC1);
+  printf("File Size\t|\tgot: %-6lld\texpected: 13\n", size);
   printf("%s\n", H2);
   printf("%s\n", H1);
 
@@ -34,11 +35,11 @@ int main() {
   printf("%51s\n", "fcGetPosition + fcPosition Test");
   printf("%s\n", H2);
   printf("Getting first and middle position (0) by moving to mid point (13 / 2)\n");
-  long before = fcGetPosition(FC1);
-  printf("Start Position\t|\tgot: %-6ld\texpected: 0\n", before);
-  fcPosition(FC1, size / 2);
-  long after = fcGetPosition(FC1);
-  printf("Mid Position\t|\tgot: %-6ld\texpected: 6\n", after);
+  long long before = fcGetPosition(&FC1);
+  printf("Start Position\t|\tgot: %-6lld\texpected: 0\n", before);
+  fcPosition(&FC1, size / 2);
+  long long after = fcGetPosition(&FC1);
+  printf("Mid Position\t|\tgot: %-6lld\texpected: 6\n", after);
   printf("%s\n", H2);
   printf("%s\n", H1);
 
@@ -47,9 +48,9 @@ int main() {
   printf("%s\n", H2);
 
   printf("Reading 6 bytes from position 0\nGot:      | ");
-  fcPosition(FC1, 0);
-  ByteBuffer BB = { (char *) malloc(after), size / 2};
-  fcRead(FC1, BB, 0);
+  fcPosition(&FC1, 0);
+  ByteBuffer BB = { (signed char *) malloc(after), size / 2};
+  fcRead(&FC1, BB, 0);
   for (int i = 0; i < size / 2; i++) {
     printf("%d | ", (int) BB.array[i]);
   }
@@ -57,7 +58,7 @@ int main() {
   printf("%s\n", H2);
 
   printf("Reading 6 bytes from position 6\nGot:      | ");
-  fcRead(FC1, BB, size / 2);
+  fcRead(&FC1, BB, size / 2);
   for (int i = 0; i < size / 2; i++) {
     printf("%d | ", (int) BB.array[i]);
   }
@@ -70,14 +71,15 @@ int main() {
   printf("%45s\n", "fcTransferFrom Test");
   printf("%s\n", H2);
   FileChannel FC2 = FileChannel_0(FILENAME2, "w");
-  long written = fcTransferFrom(FC2, FC1, 0, size * 2);
-  printf("Tried to Write: %ld\nFile Size: %ld\nTotal Written: %ld\n",
+  off_t transferPosition = (off_t) 0;
+  long long written = fcTransferFrom(&FC2, &FC1, &transferPosition, size * 2);
+  printf("Tried to Write: %lld\nFile Size: %lld\nTotal Written: %lld\n",
       size * 2, size, written);
   printf("%s\n", H2);
   printf("%s\n", H1);
 
-  fcClose(FC1);
-  fcClose(FC2);
+  fcClose(&FC1);
+  fcClose(&FC2);
 
   free(BB.array);
   return 0;

@@ -43,6 +43,8 @@ compile:
 	$(CC) $(CCFLAGS) test/FCTest.c                                           src/FileChannel.o -o test/FCTest.o
 	$(CC) $(CCFLAGS) test/SGTest.c util/StreamGenerator.o                                      -o test/SGTest.o
 	$(CC) $(CCFLAGS) test/SCTest.c util/StreamChecker.o                                        -o test/SCTest.o
+	$(CC) $(CCFLAGS) test/FULL.c   src/ArithmeticCoderFLW.o src/ByteStream.o src/FileChannel.o -o test/FULL.o
+	$(CC) $(CCFLAGS) perf/BSPerf.c                          src/ByteStream.o src/FileChannel.o -o perf/BSPerf.o
 
 clean:
 	$(RM) */*.o

@@ -7,9 +7,9 @@
 #define H1 "**************************************************************************"
 #define H2 "__________________________________________________________________________"
 
-#define pack4B(a, b, c, d) *((int*) (char[4] ) {a, b, c, d} )
+#define pack4B(a, b, c, d) *((int*) (signed char[4] ) {a, b, c, d} )
 
-char lookUpByte_0(ByteStream *BS, int targetIndex) {
+signed char lookUpByte_0(ByteStream *BS, int targetIndex) {
   for (int i = 0; i < targetIndex; ++i) {
     getByte_0(BS);
   }
@@ -22,10 +22,10 @@ int main() {
 
   ByteStream *BS = ByteStream_0();
   ByteBuffer arr = {
-    (char []){0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},
+    (signed char []){0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},
     16
   };
-  char *ptr = BS->buffer.array;
+  signed char *ptr = BS->buffer.array;
   int verif;
 
   printf("%s\n", H1);
@@ -39,7 +39,7 @@ int main() {
       putByte(BS, 1); // [0 - 255], overflow not allowed
       verif = ptr == BS->buffer.array;
     }
-    printf("old: %p\tnew: %p\tlength: %ld\n",
+    printf("old: %p\tnew: %p\tlength: %lld\n",
       ptr, BS->buffer.array, BS->buffer.length);
   }
   printf("%s\n", H2);
@@ -60,7 +60,7 @@ int main() {
       putBytes_0(BS, arr, 0, 16); // Whole array, sequences of [0-16]
       verif = ptr == BS->buffer.array;
     }
-    printf("old: %p\tnew: %p\tlength: %ld\n",
+    printf("old: %p\tnew: %p\tlength: %lld\n",
       ptr, BS->buffer.array, BS->buffer.length);
   }
   printf("%s\n", H2);
@@ -78,10 +78,10 @@ int main() {
     ptr = BS->buffer.array;
     verif = 1;
     while (verif) {
-      putBytes_1(BS, 2147483647, 256); // Max 4B value
+      putBytes_1(BS, 2147483647, 4); // Max 4B value
       verif = ptr == BS->buffer.array;
     }
-    printf("old: %p\tnew: %p\tlength: %ld\n",
+    printf("old: %p\tnew: %p\tlength: %lld\n",
       ptr, BS->buffer.array, BS->buffer.length);
   }
   printf("%s\n", H2);
@@ -148,12 +148,12 @@ int main() {
   /* Code for displaying the bits of the output number step by step in function getBytes(BS, num)
 
       // Simplified status of the buffer
-      printf("\t\t%d\t%d|%d|%d|%d\n", (char) getByte, (num >> 0) & 0xff, (num >> 8) & 0xff, (num >> 16) & 0xff, (num >> 24) & 0xff);
+      printf("\t\t%d\t%d|%d|%d|%d\n", (signed char) getByte, (num >> 0) & 0xff, (num >> 8) & 0xff, (num >> 16) & 0xff, (num >> 24) & 0xff);
 
       // New byte added
-      printf("(%d) -> %d = ", (char) getByte, b * 8);
+      printf("(%d) -> %d = ", (signed char) getByte, b * 8);
       for (int j = 7; j >= 0; j--) {
-        printf("%c", (((char) getByte) & (1 << j)) ? '1' : '0');
+        printf("%c", (((signed char) getByte) & (1 << j)) ? '1' : '0');
       }
       printf(" ");
       printf("\n");
@@ -174,22 +174,22 @@ int main() {
   ByteStream_reset(BS); // lol I lied
 
   int verifOut;
-  ByteBuffer tmpBuff0 = {malloc(getLength(BS) / 2), getLength(BS) / 2};
+  ByteBuffer tmpBuff0 = {(signed char *) malloc(getLength(BS) / 2), getLength(BS) / 2};
 
-  printf("Writing [0 - %ld] bytes into w1_0_c.tmp\n", getLength(BS) / 2);
+  printf("Writing [0 - %lld] bytes into w1_0_c.tmp\n", getLength(BS) / 2);
   FileChannel fcOut1_0 = FileChannel_0("../../files/w1_0_c.tmp", "w");
   write_1(BS, fcOut1_0, 0, getLength(BS) / 2);
-  fcClose(fcOut1_0);
+  fcClose(&fcOut1_0);
 
   printf("Checking integrity -> w1_0_c.tmp\n");
   FileChannel fcIn1_0 = FileChannel_0("../../files/w1_0_c.tmp", "r");
-  fcRead(fcIn1_0, tmpBuff0, 0);
+  fcRead(&fcIn1_0, tmpBuff0, 0);
   verifOut = 1;
-  for (long i = 0; i < getLength(BS) / 2 && verifOut; ++i) {
+  for (long long i = 0; i < getLength(BS) / 2 && verifOut; ++i) {
     verifOut = ptr[i] == tmpBuff0.array[i];
   }
   printf("Result: %s\n", verifOut ? "OK" : "Error");
-  fcClose(fcIn1_0);
+  fcClose(&fcIn1_0);
   free(tmpBuff0.array);
   printf("%s\n", H2);
   printf("%s\n", H1);
@@ -197,7 +197,7 @@ int main() {
   printf("%36s\n", "write_0 Test");
   printf("%s\n", H2);
   ByteStream_reset(BS); // lol I lied
-  ByteBuffer tmpBuff2 = {malloc(getLength(BS)), getLength(BS)};
+  ByteBuffer tmpBuff2 = {(signed char *) malloc(getLength(BS)), getLength(BS)};
 
   printf("Writing everything into w0_c.tmp\n");
   FileChannel fcOut0 = FileChannel_0("../../files/w0_c.tmp", "w");
@@ -205,16 +205,16 @@ int main() {
 
   printf("Checking integrity -> w0_c.tmp\n");
   FileChannel fcIn0 = FileChannel_0("../../files/w0_c.tmp", "r");
-  fcRead(fcIn0, tmpBuff2, 0);
+  fcRead(&fcIn0, tmpBuff2, 0);
   verifOut = 1;
-  for (long i = 0; i < getLength(BS) && verifOut; ++i) {
+  for (long long i = 0; i < getLength(BS) && verifOut; ++i) {
     verifOut = ptr[i] == tmpBuff2.array[i];
   }
   printf("Result: %s\n", verifOut ? "OK" : "Error");
-  fcClose(fcIn0);
+  fcClose(&fcIn0);
   free(tmpBuff2.array);
 
-  fcClose(fcOut0);
+  fcClose(&fcOut0);
   printf("%s\n", H1);
   /* **************************************************** */
   printf("%s\n", H1);
@@ -233,12 +233,12 @@ int main() {
   putFileSegment(BS2,     BS->limit / 4, BS->limit / 4);
   putFileSegment(BS2, 2 * BS->limit / 4, BS->limit / 4);
   putFileSegment(BS2, 3 * BS->limit / 4, BS->limit / 4);
-  printf("Limit\t\tGot: %ld\t\t\tExpected: %ld\n", BS2->limit, BS->limit);
+  printf("Limit\t\tGot: %lld\t\t\tExpected: %lld\n", BS2->limit, BS->limit);
   printf("NumSegments\tGot: %d\t\t\t\tExpected: %d\n", BS2->readFileNumSegments, 4);
 
   printf("%s\n", H2);
   for (int i = 0; i < 4; ++i) {
-    printf("Segment %d\tGot: %ld, %-16ld\tExpected: %ld, %ld\n", i,
+    printf("Segment %d\tGot: %lld, %-16lld\tExpected: %lld, %lld\n", i,
         BS2->readFileSegments.array[i][0], BS2->readFileSegments.array[i][1],
         i * BS->limit / 4, BS->limit / 4);
   }
@@ -311,20 +311,44 @@ int main() {
   printf("Checking integrity -> w0_c.tmp vs %s\n", BS2->temporalFileName);
   FileChannel fcInTmp0 = FileChannel_0("../../files/w0_c.tmp", "r");
   FileChannel fcInTmp1 = FileChannel_0(BS2->temporalFileName, "r");
-  ByteBuffer tmpBuffTmp0 = {malloc(fcSize(fcInTmp0)), fcSize(fcInTmp0)};
-  ByteBuffer tmpBuffTmp1 = {malloc(fcSize(fcInTmp1)), fcSize(fcInTmp1)};
-  fcRead(fcInTmp0, tmpBuffTmp0, 0);
-  fcRead(fcInTmp1, tmpBuffTmp1, 0);
+  ByteBuffer tmpBuffTmp0 = {(signed char *) malloc(fcSize(&fcInTmp0)), fcSize(&fcInTmp0)};
+  ByteBuffer tmpBuffTmp1 = {(signed char *) malloc(fcSize(&fcInTmp1)), fcSize(&fcInTmp1)};
+  fcRead(&fcInTmp0, tmpBuffTmp0, 0);
+  fcRead(&fcInTmp1, tmpBuffTmp1, 0);
   verifOut = 1;
   for (int i = 0; i < getLength(BS) / 2 && verifOut; ++i) {
     verifOut = tmpBuffTmp0.array[i] == tmpBuffTmp1.array[i];
   }
   printf("Result: %s\n", verifOut ? "OK" : "Error");
-  fcClose(fcInTmp0);
-  fcClose(fcInTmp1);
+  fcClose(&fcInTmp0);
+  fcClose(&fcInTmp1);
   free(tmpBuffTmp0.array);
   free(tmpBuffTmp1.array);
 
+  printf("%s\n", H1);
+  /* **************************************************** */
+  printf("%36s\n", "write_0 (temporalFile mode) Test");
+  printf("%s\n", H2);
+  FileChannel FCTMP = FileChannel_0("../../files/wt_c.tmp", "w");
+  write_0(BS2, FCTMP);
+  fcClose(&FCTMP);
+  printf("%s\n", H2);
+  printf("Checking integrity -> wt_c.tmp vs %s\n", BS2->temporalFileName);
+  FileChannel fcInTmp2 = FileChannel_0("../../files/wt_c.tmp", "r");
+  FileChannel fcInTmp3 = FileChannel_0(BS2->temporalFileName, "r");
+  ByteBuffer tmpBuffTmp2 = {(signed char *) malloc(fcSize(&fcInTmp3)), fcSize(&fcInTmp2)};
+  ByteBuffer tmpBuffTmp3 = {(signed char *) malloc(fcSize(&fcInTmp2)), fcSize(&fcInTmp3)};
+  fcRead(&fcInTmp2, tmpBuffTmp2, 0);
+  fcRead(&fcInTmp3, tmpBuffTmp3, 0);
+  verifOut = 1;
+  for (int i = 0; i < getLength(BS2) / 2 && verifOut; ++i) {
+    verifOut = tmpBuffTmp2.array[i] == tmpBuffTmp3.array[i];
+  }
+  printf("Result: %s\n", verifOut ? "OK" : "Error");
+  fcClose(&fcInTmp2);
+  fcClose(&fcInTmp3);
+  free(tmpBuffTmp2.array);
+  free(tmpBuffTmp3.array);
   printf("%s\n", H1);
   /* **************************************************** */
   printf("%36s\n", "loadFromTemporalFile Test");

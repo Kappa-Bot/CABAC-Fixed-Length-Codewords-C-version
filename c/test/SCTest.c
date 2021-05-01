@@ -16,13 +16,13 @@
 #define FILENAME5 "../../files/w1_0_c.tmp"
 #define FILENAME6 "../../files/w1_0_j.tmp"
 
-// Same content: whole buffer from BSTest
+// Same content: write(normal) from BSTest
 #define FILENAME7 "../../files/w0_c.tmp"
 #define FILENAME8 "../../files/w0_j.tmp"
 
-// Same content: temporalfile vs write
-#define FILENAME9 "../../files/w0_c.tmp"
-#define FILENAME10 "../../files/TMP-000.tmp"
+// Same content: write(temporalFile) from BSTest
+#define FILENAME9 "../../files/wt_c.tmp"
+#define FILENAME10 "../../files/wt_j.tmp"
 
 void runTest(char *file1, char *file2) {
   printf("%s\n", H1);
@@ -34,7 +34,7 @@ void runTest(char *file1, char *file2) {
 
   printf("File name 1: %s\n", file1);
   printf("File name 2: %s\n", file2);
-  printf("Content size: %ld\n", SC.size);
+  printf("Content size: %lld\n", SC.size);
 
   printf("%s\n", H1);
 
@@ -52,9 +52,9 @@ void runTest(char *file1, char *file2) {
   printf("%42s\n", "scCheckError Test");
   printf("%s\n", H2);
 
-  long error = scCheckError(SC);
+  long long error = scCheckError(SC);
 
-  printf("Test %s %ld\n", error == SC.size ? "failed, error at size:"
+  printf("Test %s %lld\n", error == SC.size ? "failed, error at size:"
                       : (error == -1 ? "passed with return:"
                                     : "failed, error at position:"), error);
   printf("%s\n", H2);
@@ -64,13 +64,12 @@ void runTest(char *file1, char *file2) {
 }
 
 int main() {
-
   runTest(FILENAME1, FILENAME2);
   runTest(FILENAME1, FILENAME3);
   runTest(FILENAME3, FILENAME4);
   runTest(FILENAME5, FILENAME6);
   runTest(FILENAME7, FILENAME8);
-  // runTest(FILENAME9, FILENAME10);
+  runTest(FILENAME9, FILENAME10);
 
   return 0;
 }

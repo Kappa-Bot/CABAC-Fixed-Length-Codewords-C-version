@@ -125,13 +125,13 @@ public class ACTest {
       System.out.printf("%s\n", H2);
       System.out.printf("Terminating with %d bytes on buffer\n", (int) BS.getLength());
       ACFLW.terminate();
-      System.out.printf("ByteStream limit  \t\tgot: %d bytes\texpected: %d\n", (int) BS.getLength(), 1354);
-      System.out.printf("ByteStream length \t\tgot: %d bytes\texpected: %d\n", (int) BS.getByteStream().length, 2048);
+      System.out.printf("ByteStream limit  \t\tgot: %d bytes\texpected: %d\n", (int) BS.getLength(), 687);
+      System.out.printf("ByteStream length \t\tgot: %d bytes\texpected: %d\n", (int) BS.getByteStream().length, 1024);
       System.out.printf("%s\n", H2);
       System.out.printf("Terminating (again) with %d bytes on buffer\n", (int) BS.getLength());
       ACFLW.terminate();
-      System.out.printf("ByteStream limit  (again)\tgot: %-10d bytes\texpected: %d\n", (int) BS.getLength(), 1357);
-      System.out.printf("ByteStream length (again)\tgot: %-10d bytes\texpected: %d\n", (int) BS.getByteStream().length, 2048);
+      System.out.printf("ByteStream limit  (again)\tgot: %-10d bytes\texpected: %d\n", (int) BS.getLength(), 689);
+      System.out.printf("ByteStream length (again)\tgot: %-10d bytes\texpected: %d\n", (int) BS.getByteStream().length, 1024);
       System.out.printf("%s\n", H2);
       System.out.printf("ByteStream buffer has currently %d bytes, encoding another 1M bits (1..1)\n", (int) BS.getLength());
       for (int i = 0; i < 1000000; ++i) {
@@ -140,10 +140,11 @@ public class ACTest {
       System.out.printf("%s\n", H2);
       System.out.printf("Terminating with %d bytes on buffer\n", (int) BS.getLength());
       ACFLW.terminate();
-      System.out.printf("ByteStream limit  \t\tgot: %-10d bytes\texpected: %d\n", (int) BS.getLength(), 10693);
-      System.out.printf("ByteStream length \t\tgot: %-10d bytes\texpected: %d\n", (int) BS.getByteStream().length, 16384);
+      System.out.printf("ByteStream limit  \t\tgot: %-10d bytes\texpected: %d\n", (int) BS.getLength(), 134024);
+      System.out.printf("ByteStream length \t\tgot: %-10d bytes\texpected: %d\n", (int) BS.getByteStream().length, 262144);
       System.out.printf("%s\n", H2);
       /* **************************************************** */
+      ACFLW.restartDecoding();
       byte[] decodedBuffer = new byte[(int) BS.getLength()];
       int idx = 0;
       /* **************************************************** */
@@ -154,7 +155,7 @@ public class ACTest {
       for (int i = 1; i < 5; ++i) {
         for (int j = 7; j >= 0; --j) {
           int decodedAux = ACFLW.decodeBitProb(ACFLW.prob0ToFLW(probSet[i], 15)) == true ? 1 : 0;
-          decodedBuffer[idx] |= decodedAux << j;
+          decodedBuffer[idx] |= (decodedAux << j);
         }
         idx++;
       }

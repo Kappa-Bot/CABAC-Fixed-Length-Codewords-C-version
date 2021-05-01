@@ -10,8 +10,8 @@ StreamChecker scConfig(char *fileName1, char *fileName2) {
   fseek(object.file1, 0L, SEEK_END);
   fseek(object.file2, 0L, SEEK_END);
 
-  long size1 = ftell(object.file1);
-  long size2 = ftell(object.file2);
+  long long size1 = ftell(object.file1);
+  long long size2 = ftell(object.file2);
 
   fseek(object.file1, 0L, SEEK_SET);
   fseek(object.file2, 0L, SEEK_SET);
@@ -31,8 +31,8 @@ int scCheckEquals(StreamChecker object) {
   if (object.size) {
     verif = 1;
 
-    char c1 = 0;
-    char c2 = 0;
+    signed char c1 = 0;
+    signed char c2 = 0;
 
     for (int i = 0; (i < object.size) && verif; ++i) {
       c1 = fgetc(object.file1);
@@ -48,17 +48,17 @@ int scCheckEquals(StreamChecker object) {
   return verif;
 }
 
-long scCheckError(StreamChecker object) {
+long long scCheckError(StreamChecker object) {
   fseek(object.file1, 0L, SEEK_SET);
   fseek(object.file2, 0L, SEEK_SET);
 
-  long error = object.size;
+  long long error = object.size;
 
   if (object.size) {
     error = -1;
 
-    char c1 = 0;
-    char c2 = 0;
+    signed char c1 = 0;
+    signed char c2 = 0;
 
     for (int i = 0; (i < object.size) && (error == -1); ++i) {
       c1 = fgetc(object.file1);
