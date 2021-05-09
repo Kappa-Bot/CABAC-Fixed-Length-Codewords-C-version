@@ -1,3 +1,6 @@
+package test;
+import core.*;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -227,7 +230,7 @@ public class ACTest {
       for (int i = 0; i < 5; ++i) {
         int decodedAux = ACFLW.decodeInteger(8);
         for (int j = 7; j >= 0; --j) {
-          decodedBuffer[idx] |= (0b1 & decodedAux) << j;
+          decodedBuffer[idx] |= (0x1 & decodedAux) << j;
         }
         idx++;
       }

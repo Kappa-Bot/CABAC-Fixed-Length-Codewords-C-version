@@ -78,7 +78,7 @@ int main() {
     ptr = BS->buffer.array;
     verif = 1;
     while (verif) {
-      putBytes_1(BS, 2147483647, 4); // Max 4B value
+      putBytes_1(BS, pack4B(1, 63, 127, 255), 4); // Max 4B value
       verif = ptr == BS->buffer.array;
     }
     printf("old: %p\tnew: %p\tlength: %lld\n",
@@ -92,18 +92,13 @@ int main() {
   /* **************************************************** */
   printf("%36s\n", "getByte_1 Test (normal mode)");
   printf("%s\n", H2);
-
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS, 0), ptr[0]);
   printf("%s\n", H2);
-
   printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS, 65534), ptr[65534]);
   printf("%s\n", H2);
-
   printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS, 524287), ptr[524287]);
   printf("%s\n", H2);
-
-  printf("Index: 1000000\t\t Got: %d\t\t\tExpected: %d\n", getByte_1(BS, 1000000), ptr[1000000]);
-
+  printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS, BS->limit - 1), ptr[BS->limit - 1]);
   printf("%s\n", H1);
   /* **************************************************** */
   printf("%36s\n", "getByte_0 Test (normal mode)");
@@ -112,14 +107,11 @@ int main() {
   // Just don't want employ resets here for future tests
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS, 0), ptr[0]);
   printf("%s\n", H2);
-
   printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS, 65534 - 1), ptr[65534]);
   printf("%s\n", H2);
-
   printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS, 524287 - 65535), ptr[524287]);
   printf("%s\n", H2);
-
-  printf("Index: 1000000\t\t Got: %d\t\t\tExpected: %d\n", lookUpByte_0(BS, 1000000 - 524288), ptr[1000000]);
+  printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS, BS->limit - 1 - 524288), ptr[BS->limit - 1]);
   printf("%s\n", H2);
   /* **************************************************** */
   printf("%36s\n", "getBytes Test (normal mode)");
@@ -128,20 +120,15 @@ int main() {
 
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", getBytes(BS, 1), pack4B(ptr[0], 0, 0, 0));
   printf("%s\n", H2);
-
   printf("Index: 1-2\t\t Got: %d\t\tExpected: %d\n", getBytes(BS, 2), pack4B(ptr[2], ptr[1], 0, 0));
   printf("%s\n", H2);
-
   printf("Index: 3-5\t\t Got: %d\t\tExpected: %d\n", getBytes(BS, 3), pack4B(ptr[5], ptr[4], ptr[3], 0));
   printf("%s\n", H2);
-
   printf("Index: 6-9\t\t Got: %d\t\tExpected: %d\n", getBytes(BS, 4), pack4B(ptr[9], ptr[8], ptr[7], ptr[6]));
   printf("%s\n", H2);
-
   printf("Index: 10-14\t\t Got: %d \t\tExpected: %d\n", getBytes(BS, 5),
     pack4B(ptr[14], ptr[13], ptr[12], ptr[11]) + pack4B(ptr[10], 0, 0, 0));
   printf("%s\n", H2);
-
   printf("Index: 15-22\t\t Got: %d \tExpected: %d\n", getBytes(BS, 8),
     pack4B(ptr[22], ptr[21], ptr[20], ptr[19]) + pack4B(ptr[18], ptr[17], ptr[16], ptr[15]));
   printf("%s\n", H2);
@@ -242,25 +229,18 @@ int main() {
         BS2->readFileSegments.array[i][0], BS2->readFileSegments.array[i][1],
         i * BS->limit / 4, BS->limit / 4);
   }
-
-
   printf("%s\n", H1);
   /* **************************************************** */
   printf("%36s\n", "getByte_1 Test (readFile mode)");
   printf("%s\n", H2);
   printf("Checking integrity of buffer with normalMode ByteStream\n");
-
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, 0), getByte_1(BS, 0));
   printf("%s\n", H2);
-
   printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, 65534), getByte_1(BS, 65534));
   printf("%s\n", H2);
-
   printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, 524287), getByte_1(BS, 524287));
   printf("%s\n", H2);
-
   printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, BS2->limit - 1), getByte_1(BS, BS->limit - 1));
-
   printf("%s\n", H1);
   /* **************************************************** */
   printf("%36s\n", "getByte_0 Test (readFile mode)");
@@ -269,16 +249,12 @@ int main() {
   // Just don't want employ resets here for future tests
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, 0), ptr[0]);
   printf("%s\n", H2);
-
   printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, 2047 - 1), ptr[2047]);
   printf("%s\n", H2);
-
   printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, 65535 - 2048), ptr[65535]);
   printf("%s\n", H2);
-
   printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, BS2->limit - 1 - 65536), ptr[BS->limit - 1]);
   printf("%s\n", H2);
-
   printf("%s\n", H1);
   /* **************************************************** */
   printf("%36s\n", "endReadFileMode Test");
@@ -288,18 +264,13 @@ int main() {
   // From here, BS2 has streamMode = 0
   printf("Verifying both normalMode buffers\n");
   printf("%s\n", H2);
-
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[0], BS->buffer.array[0]);
   printf("%s\n", H2);
-
   printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[65534], BS->buffer.array[65534]);
   printf("%s\n", H2);
-
   printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[524287], BS->buffer.array[524287]);
   printf("%s\n", H2);
-
   printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[BS2->limit - 1], BS->buffer.array[BS->limit - 1]);
-
   printf("%s\n", H1);
   /* **************************************************** */
   printf("%36s\n", "saveToTemporalFile Test");
@@ -357,16 +328,12 @@ int main() {
   loadFromTemporalFile(BS2);
   printf("Verifying both normalMode buffers\n");
   printf("%s\n", H2);
-
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[0], BS->buffer.array[0]);
   printf("%s\n", H2);
-
   printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[65534], BS->buffer.array[65534]);
   printf("%s\n", H2);
-
   printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[524287], BS->buffer.array[524287]);
   printf("%s\n", H2);
-
   printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", BS2->buffer.array[BS2->limit - 1], BS->buffer.array[BS->limit - 1]);
   printf("%s\n", H1);
   /* **************************************************** */
@@ -382,13 +349,10 @@ int main() {
   returnReadFileMode(BS2);
   printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, 0), getByte_1(BS, 0));
   printf("%s\n", H2);
-
   printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, 65534), getByte_1(BS, 65534));
   printf("%s\n", H2);
-
   printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, 524287), getByte_1(BS, 524287));
   printf("%s\n", H2);
-
   printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", getByte_1(BS2, BS2->limit - 1), getByte_1(BS, BS->limit - 1));
   printf("%s\n", H1);
   /* **************************************************** */

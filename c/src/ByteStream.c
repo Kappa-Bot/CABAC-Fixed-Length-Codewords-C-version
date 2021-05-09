@@ -79,6 +79,7 @@ ByteStream *ByteStream_2(FileChannel fc) {
     object->readFileSegments.array[i] = (long long *) malloc(2 * sizeof(long long));
   }
 
+
   object->streamMode = 1;
   #ifdef _OPENMP
     omp_init_lock(&object->lock);
@@ -156,18 +157,21 @@ void putBytes_1(ByteStream *object, int num, int numBytes) {
  *
  * @param begin position of the first byte of the file that is added to the stream
  * @param length length of the segment
- * @throws Exception when some problem introducing the segment occurs
  */
 void putFileSegment(ByteStream *object, long long begin, long long length) {
   assert(object->streamMode == 1);
-  assert(object->readFileChannel != NULL);
+  assert(object->readFileChannel.file != NULL);
   assert((begin >= 0) && (length > 0));
-  assert(begin + length <= fcSize(&object->readFileChannel));
+  assert(begin + length <= object->readFileChannel.stat.st_size);
   assert(object->readFileNumSegments <= object->readFileSegments.length);
 
   if(object->readFileNumSegments == object->readFileSegments.length) {
-    long long** fcSegmentsTMP = (long long **) malloc
-            (object->readFileSegments.length * 2 * 2 * sizeof(long long));
+
+    long long **fcSegmentsTMP = (long long **) malloc(object->readFileSegments.length * 2 * sizeof(long long *));
+    for (int segment = 0; segment < object->readFileSegments.length * 2; ++segment) {
+      fcSegmentsTMP[segment] = (long long *) malloc(2 * sizeof(long long));
+    }
+
     for(int segment = 0; segment < object->readFileNumSegments; segment++) {
       fcSegmentsTMP[segment][0] = object->readFileSegments.array[segment][0];
       fcSegmentsTMP[segment][1] = object->readFileSegments.array[segment][1];
@@ -220,7 +224,6 @@ void removeBytes(ByteStream *object, int num) {
  * is in normal or readFile mode.
  *
  * @return the corresponding byte
- * @throws Exception when the end of the stream is reached
  */
 signed char getByte_0(ByteStream *object) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
@@ -237,11 +240,12 @@ signed char getByte_0(ByteStream *object) {
  *
  * @param index the index of the byte (starting from 0)
  * @return the corresponding byte
- * @throws Exception when the indicated index is not valid
  */
 signed char getByte_1(ByteStream *object, long long index) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
-  assert(index < 0 || index >= object->limit);
+  // Temporal code
+  assert(index >= 0 && index <= object->limit);
+  // assert(index < 0 || index >= object->limit);
 
   signed char getByte = 0;
   if(object->streamMode == 0) {
@@ -258,10 +262,10 @@ signed char getByte_1(ByteStream *object, long long index) {
     //Determines the position in the file
     long long fcPosition = index - accBytes
                 + object->readFileSegments.array[segment][0];
-    assert(fcPosition < fcSize(&object->readFileChannel));
+    assert(fcPosition < object->readFileChannel.stat.st_size);
 
     //Gets the byte
-    fcRead1B(&object->readFileChannel, object->temporalBuffer, fcPosition);
+    fcRead(&object->readFileChannel, object->temporalBuffer, fcPosition);
     getByte = object->temporalBuffer.array[0];
   }
   return(getByte);
@@ -273,7 +277,6 @@ signed char getByte_1(ByteStream *object, long long index) {
  *
  * @param numBytes number of bytes read
  * @return the integer having the corresponding bytes
- * @throws Exception when the end of the stream is reached
  */
 int getBytes(ByteStream *object, int numBytes) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
@@ -293,7 +296,6 @@ int getBytes(ByteStream *object, int numBytes) {
  * be called when the stream is in normal or readFile mode.
  *
  * @return true when there are one or more bytes
- * @throws IOException when some problem with the file occurs
  */
 int hasMoreBytes(ByteStream *object) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
@@ -370,7 +372,6 @@ void skip(ByteStream *object, long long numBytes) {
  * entering in the normal mode. This stream can return to the readFile mode
  * calling <code>returnReadFileMode</code>.
  *
- * @throws IOException when some problem reading the file occurs
  */
 void endReadFileMode(ByteStream *object) {
   assert(object->streamMode == 1);
@@ -468,7 +469,6 @@ int isInTemporalFile(ByteStream *object) {
  * normal or readFile mode.
  *
  * @param fos file in which is written
- * @throws IOException when some error writing in the file occurs
  */
 void write_0(ByteStream *object, FileChannel fc) {
   assert((object->streamMode == 0) || (object->streamMode == 2));
@@ -482,7 +482,6 @@ void write_0(ByteStream *object, FileChannel fc) {
  * @param fos file in which is written
  * @param begin first byte of the stream written
  * @param length length written
- * @throws IOException when some error writing in the file occurs
  */
 void write_1(ByteStream *object, FileChannel outputFC, long long begin, long long length) {
   assert((object->streamMode == 0) || (object->streamMode == 2));
@@ -511,7 +510,6 @@ void write_1(ByteStream *object, FileChannel outputFC, long long begin, long lon
  * called when the stream is in normal mode.
  *
  * @param temporalDirectory temporal directory in which the file is saved
- * @throws Exception when some problem writing the file occurs
  */
 void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
   assert(object->streamMode == 0);
@@ -554,7 +552,6 @@ void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
  * Loads the stream from the file in which it was saved. Data of the stream is not deleted
  * from the file. This function can only be called when the stream is in temporalFile mode.
  *
- * @throws Exception when some problem reading the file occurs
  */
 void loadFromTemporalFile(ByteStream *object) {
   assert(object->streamMode == 2);
@@ -576,7 +573,7 @@ void loadFromTemporalFile(ByteStream *object) {
  * long longer needed.
  */
 void destroy(ByteStream *object) {
-  if(object->buffer.length > 0) { // normal | (readFile + end() + save() + load())
+  if(object->buffer.length > 0) { // normal | (readFile + end() + ...)
     free(object->buffer.array);
   }
   if(object->streamMode == 1) { // readFile
@@ -595,8 +592,6 @@ void destroy(ByteStream *object) {
 /**
  * Destroys the temporal file shared by all objects of this class. Call this function only
  * when objects of this class are no long longer needed.
- *
- * @throws Exception when some problem removing the temporary file occurs
  */
 void destroyTemporalFile(ByteStream *object) {
   if(object->temporalFileName != NULL) {

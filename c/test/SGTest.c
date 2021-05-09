@@ -2,7 +2,7 @@
 
 #define PATH "../../files/"
 #define EXT ".tmp"
-#define FILESIZE 4096
+#define FILESIZE (1024 * 1024 * 16) // 16MB
 #define FILECOUNT 2
 
 StreamGenerator SG;

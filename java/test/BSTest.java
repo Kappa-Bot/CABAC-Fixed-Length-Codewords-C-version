@@ -1,3 +1,5 @@
+package test;
+import core.ByteStream;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -90,7 +92,7 @@ public class BSTest {
              *     129       -127
              *     255        -1
              */
-             BS.putBytes(2147483647, 4); // Max 4B value
+            BS.putBytes(pack4B((byte) 1, (byte) 63, (byte) 127, (byte) 255), 4); // Max 4B value
             verif = ptr == BS.getByteStream();
           }
           System.out.printf("old: %s  \tnew: %s  \tlength: %d\n",
@@ -105,34 +107,25 @@ public class BSTest {
         BS.reset();
         System.out.printf("%36s\n", "getByte_1 Test (normal mode)");
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS.getByte(0), BS.getByteStream()[0]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", BS.getByte(65534), BS.getByteStream()[65534]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", BS.getByte(524287), BS.getByteStream()[524287]);
         System.out.printf("%s\n", H2);
-
-        System.out.printf("Index: 1000000\t\t Got: %d\t\t\tExpected: %d\n", BS.getByte(1000000), BS.getByteStream()[1000000]);
-
+        System.out.printf("Index: limit - 1\t\t Got: %d\t\t\tExpected: %d\n", BS.getByte((int) BS.getLength() - 1), BS.getByteStream()[(int) BS.getLength() - 1]);
         System.out.printf("%s\n", H1);
         /* **************************************************** */
         System.out.printf("%36s\n", "getByte_0 Test (normal mode)");
         System.out.printf("%s\n", H2);
-
         // Just don't want employ resets here for future tests
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS, 0), BS.getByteStream()[0]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS, 65534 - 1), BS.getByteStream()[65534]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS, 524287 - 65535), BS.getByteStream()[524287]);
         System.out.printf("%s\n", H2);
-
-        System.out.printf("Index: 1000000\t\t Got: %d\t\t\tExpected: %d\n", lookUpByte_0(BS, 1000000 - 524288), BS.getByteStream()[1000000]);
+        System.out.printf("Index: limit - 1\t\t Got: %d\t\t\tExpected: %d\n", lookUpByte_0(BS, (int) BS.getLength() - 1 - 524288), BS.getByteStream()[(int) BS.getLength() - 1]);
         System.out.printf("%s\n", H2);
         /* **************************************************** */
         System.out.printf("%36s\n", "getBytes Test (normal mode)");
@@ -141,20 +134,15 @@ public class BSTest {
 
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS.getBytes(1), pack4B(BS.getByteStream()[0], (byte) 0, (byte) 0, (byte) 0));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 1-2\t\t Got: %d\t\tExpected: %d\n", BS.getBytes(2), pack4B(BS.getByteStream()[2], BS.getByteStream()[1], (byte) 0, (byte) 0));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 3-5\t\t Got: %d\t\tExpected: %d\n", BS.getBytes(3), pack4B(BS.getByteStream()[5], BS.getByteStream()[4], BS.getByteStream()[3], (byte) 0));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 6-9\t\t Got: %d\t\tExpected: %d\n", BS.getBytes(4), pack4B(BS.getByteStream()[9], BS.getByteStream()[8], BS.getByteStream()[7], BS.getByteStream()[6]));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 10-14\t\t Got: %d \t\tExpected: %d\n", BS.getBytes(5),
           pack4B(BS.getByteStream()[14], BS.getByteStream()[13], BS.getByteStream()[12], BS.getByteStream()[11]) + pack4B(BS.getByteStream()[10], (byte) 0, (byte) 0, (byte) 0));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 15-22\t\t Got: %d \tExpected: %d\n", BS.getBytes(8),
           pack4B(BS.getByteStream()[22], BS.getByteStream()[21], BS.getByteStream()[20], BS.getByteStream()[19])
           + pack4B(BS.getByteStream()[18], BS.getByteStream()[17], BS.getByteStream()[16], BS.getByteStream()[15]));
@@ -261,36 +249,26 @@ public class BSTest {
         System.out.printf("%36s\n", "getByte_1 Test (readFile mode)");
         System.out.printf("%s\n", H2);
         System.out.printf("Checking integrity of buffer with normalMode ByteStream\n");
-
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS2.getByte(0), BS.getByte(0));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", BS2.getByte(65534), BS.getByte(65534));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", BS2.getByte(524287), BS.getByte(524287));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", BS2.getByte((int) BS2.getLength() - 1), BS.getByte((int) BS.getLength() - 1));
-
         System.out.printf("%s\n", H1);
         /* **************************************************** */
         System.out.printf("%36s\n", "getByte_0 Test (readFile mode)");
         System.out.printf("%s\n", H2);
-
         // Just don't want employ resets here for future tests
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, 0), ptr[0]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, 2047 - 1), ptr[2047]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, 65535 - 2048), ptr[65535]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", lookUpByte_0(BS2, (int) BS2.getLength() - 1 - 65536), ptr[(int) BS.getLength() - 1]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("%s\n", H1);
         /* **************************************************** */
         System.out.printf("%36s\n", "endReadFileMode Test");
@@ -303,13 +281,10 @@ public class BSTest {
 
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[0], BS.getByteStream()[0]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[65534], BS.getByteStream()[65534]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[524287], BS.getByteStream()[524287]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[(int) BS2.getLength() - 1], BS.getByteStream()[(int) BS.getLength() - 1]);
 
         System.out.printf("%s\n", H1);
@@ -372,16 +347,12 @@ public class BSTest {
         BS2.loadFromTemporalFile();
         System.out.printf("Verifying both normalMode buffers\n");
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[0], BS.getByteStream()[0]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[65534], BS.getByteStream()[65534]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[524287], BS.getByteStream()[524287]);
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", BS2.getByteStream()[(int) BS2.getLength() - 1], BS.getByteStream()[(int) BS.getLength() - 1]);
         System.out.printf("%s\n", H1);
         /* **************************************************** */
@@ -397,13 +368,10 @@ public class BSTest {
         BS2.returnReadFileMode();
         System.out.printf("Index: 0\t\t Got: %d\t\tExpected: %d\n", BS2.getByte(0), BS.getByte(0));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 65534\t\t Got: %d\t\tExpected: %d\n", BS2.getByte(65534), BS.getByte(65534));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: 524287\t\t Got: %d\t\tExpected: %d\n", BS2.getByte(524287), BS.getByte(524287));
         System.out.printf("%s\n", H2);
-
         System.out.printf("Index: limit-1\t\t Got: %d\t\tExpected: %d\n", BS2.getByte((int) BS2.getLength() - 1), BS.getByte((int) BS.getLength() - 1));
         System.out.printf("%s\n", H1);
         /* **************************************************** */

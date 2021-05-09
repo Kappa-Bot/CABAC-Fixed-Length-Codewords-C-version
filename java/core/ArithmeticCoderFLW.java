@@ -7,9 +7,9 @@
  * You should have received a copy of the BOI License along with this program. If not,
  * see <http://www.deic.uab.cat/~francesc/software/license/>.
  */
-//package coders;
+package core;
 
-//import streams.ByteStream;
+// import streams.ByteStream;
 
 
 /**

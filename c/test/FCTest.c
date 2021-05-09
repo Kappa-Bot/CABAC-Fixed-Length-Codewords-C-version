@@ -68,13 +68,38 @@ int main() {
   printf("%s\n", H1);
 
   /* **************************************************** */
+  printf("%41s\n", "fcRead1B Test");
+  printf("%s\n", H2);
+
+  printf("Reading 6 bytes from position 0\nGot:      | ");
+  fcPosition(&FC1, 0);
+  ByteBuffer BB1B = { (signed char *) malloc(1), 1};
+  for (int i = 0; i < size / 2; i++) {
+    fcRead1B(&FC1, BB1B, i);
+    printf("%d | ", (int) BB1B.array[0]);
+  }
+  printf("\nExpected: | 108 | 111 | 114 | 101 | 109 | 32 | = \'lorem \'\n");
+  printf("%s\n", H2);
+
+  printf("Reading 6 bytes from position 6\nGot:      | ");
+  for (int i = size / 2; i < size - 1; i++) {
+    fcRead1B(&FC1, BB1B, i);
+    printf("%d | ", (int) BB1B.array[0]);
+  }
+  printf("\nExpected: | 105 | 112 | 115 | 117 | 109 | 13 | = \'ipsum\\n\'\n");
+
+  printf("%s\n", H2);
+  printf("%s\n", H1);
+
+  /* **************************************************** */
   printf("%45s\n", "fcTransferFrom Test");
   printf("%s\n", H2);
   FileChannel FC2 = FileChannel_0(FILENAME2, "w");
+  printf("File size before: %lld\n", fcSize(&FC2));
   off_t transferPosition = (off_t) 0;
   long long written = fcTransferFrom(&FC2, &FC1, &transferPosition, size * 2);
-  printf("Tried to Write: %lld\nFile Size: %lld\nTotal Written: %lld\n",
-      size * 2, size, written);
+  printf("Tried to Write: %lld\nFile Size: %lld\nTotal Written: %lld\nFile size after: %lld\n",
+      size * 2, size, written, fcSize(&FC2));
   printf("%s\n", H2);
   printf("%s\n", H1);
 

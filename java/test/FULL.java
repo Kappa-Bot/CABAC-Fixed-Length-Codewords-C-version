@@ -1,3 +1,6 @@
+package test;
+import core.*;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,14 +24,17 @@ public class FULL {
   }
 
   public static void main(String[] args) throws IOException, Exception {
-    code_table['A'] = 4;
-    code_table['R'] = 5;
-    code_table['I'] = 6;
-    code_table['T'] = 7;
-    code_table['H'] = 8;
-    code_table['M'] = 9;
-    code_table['E'] = 10;
-    code_table['C'] = 11;
+    for (int i = 0; i < 256; ++i) {
+      code_table[i] = 255;
+    }
+    code_table['A'] = 0;
+    code_table['R'] = 1;
+    code_table['I'] = 2;
+    code_table['T'] = 3;
+    code_table['H'] = 4;
+    code_table['M'] = 5;
+    code_table['E'] = 6;
+    code_table['C'] = 7;
 
 
     System.out.printf("Initializing ArithmeticCoderFLW\n");
@@ -39,7 +45,7 @@ public class FULL {
      *  - precisionBits  ->  8
      *  - numContexts    ->  1
      */
-    ArithmeticCoderFLW ACN = new ArithmeticCoderFLW(4, 8, 1);
+    ArithmeticCoderFLW ACN = new ArithmeticCoderFLW(3, 8, 1);
 
     System.out.printf("Initializing ByteStream (normal mode)\n");
     /*
@@ -59,17 +65,17 @@ public class FULL {
      * Encoding the Message
      *  A - R - I - T - H - M - E - T - I - C
      */
-    for (int i = 0; i < 10; ++i) {
-      ACN.encodeInteger(code_table['A'], 4);
-      ACN.encodeInteger(code_table['R'], 4);
-      ACN.encodeInteger(code_table['I'], 4);
-      ACN.encodeInteger(code_table['T'], 4);
-      ACN.encodeInteger(code_table['H'], 4);
-      ACN.encodeInteger(code_table['M'], 4);
-      ACN.encodeInteger(code_table['E'], 4);
-      ACN.encodeInteger(code_table['T'], 4);
-      ACN.encodeInteger(code_table['I'], 4);
-      ACN.encodeInteger(code_table['C'], 4);
+    for (int i = 0; i < 24; ++i) {
+      ACN.encodeInteger(code_table['A'], 3);
+      ACN.encodeInteger(code_table['R'], 3);
+      ACN.encodeInteger(code_table['I'], 3);
+      ACN.encodeInteger(code_table['T'], 3);
+      ACN.encodeInteger(code_table['H'], 3);
+      ACN.encodeInteger(code_table['M'], 3);
+      ACN.encodeInteger(code_table['E'], 3);
+      ACN.encodeInteger(code_table['T'], 3);
+      ACN.encodeInteger(code_table['I'], 3);
+      ACN.encodeInteger(code_table['C'], 3);
     }
 
     /* **************************************************** */
@@ -81,7 +87,7 @@ public class FULL {
     char []aux = new char[(int) BSN.getLength()];
     for (int i = 0; i < BSN.getLength(); ++i) {
       // Looks for a match in code_table[] for the 3-bits flw
-      aux[i] = lookupTable(ACN.decodeInteger(4));
+      aux[i] = lookupTable(ACN.decodeInteger(3));
     }
 
     // Should print ARITHMETIC
@@ -108,7 +114,7 @@ public class FULL {
      *  - precisionBits  ->  8
      *  - numContexts    ->  1
      */
-    ArithmeticCoderFLW ACR = new ArithmeticCoderFLW(4, 8, 1);
+    ArithmeticCoderFLW ACR = new ArithmeticCoderFLW(3, 8, 1);
 
     // Using the previously coded stream written into the file
     FileChannel FCR = FileChannel.open(FileSystems.getDefault()
@@ -133,7 +139,7 @@ public class FULL {
     char []aux2 = new char[(int) BSR.getLength()];
     for (int i = 0; i < BSR.getLength(); ++i) {
       // Looks for a match in code_table[] for the 3-bits flw
-      aux2[i] = lookupTable(ACR.decodeInteger(4));
+      aux2[i] = lookupTable(ACR.decodeInteger(3));
     }
 
     // Should print ARITHMETIC

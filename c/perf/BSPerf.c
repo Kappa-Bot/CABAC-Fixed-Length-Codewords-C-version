@@ -8,8 +8,6 @@
 #define DEFAULT_P2 1000000L
 #define DEFAULT_P3 ((long) INITIAL_ALLOCATION)
 
-#define pack4B(a, b, c, d) *((int*) (signed char[4] ) {a, b, c, d} )
-
 /*
  * Sequentially executes the function getByte to get
  * a ByteStream BS's position equal to targetIndex
@@ -51,12 +49,17 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
           P1, P2, P3);
 
+      BS = ByteStream_1(P3);
+
       for (int i = 0; i < P1; ++i) {
-        BS = ByteStream_1(P3);
-        fillByteStream(BS, P2);
-        destroy(BS);
-        free(BS);
+        for (int i = 0; i < P2; ++i) {
+          putByte(BS, (signed char) (i & 0xFF));
+        }
+        clear(BS);
       }
+
+      destroy(BS);
+      free(BS);
       break;
 
     case 1:
@@ -64,18 +67,20 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
           P1, P2, P3);
 
+      BS = ByteStream_1(P3);
       BB = (ByteBuffer) { malloc(P2), P2 };
 
       for (int i = 0; i < P1; ++i) {
-        BS = ByteStream_1(P3);
         putBytes_0(BS, BB, 0, P2);
-        destroy(BS);
-        free(BS);
+        clear(BS);
       }
+
+      destroy(BS);
+      free(BS);
       break;
 
     case 2:
-      printf("Performance test for getByte_0() with:" \
+      printf("Performance test for getByte_0(normal mode) with:" \
           "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
           P1, P2, P3);
 
@@ -92,45 +97,46 @@ int main(int argc, char *argv[]) {
       break;
 
     case 3:
-      printf("Performance test (readFile mode) for getByte_0() with:" \
+      printf("Performance test for getByte_0(readFile mode) with:" \
           "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
           P1, P2, P3);
 
+      FC = FileChannel_0("../../files/w0_c.tmp", "r");
+      BS = ByteStream_2(FC);
 
-
-      /*
-      putFileSegment(BS, 0, FC.stat.st_size);
-      for (int i = 0; i < FC.stat.st_blocks; i++) {
+      for (int i = 0; i < FC.stat.st_size / FC.stat.st_blksize; i++) {
         putFileSegment(BS, i * FC.stat.st_blksize, FC.stat.st_blksize);
       }
-      putFileSegment(BS, FC.stat.st_blocks, P2 % FC.stat.st_blksize);
-      */
 
       for (int i = 0; i < P1; ++i) {
-        FC = FileChannel_0("../../files/w0_c.tmp", "r");
-        BS = ByteStream_2(FC);
-
-        putFileSegment(BS, 0, FC.stat.st_size);
-
-        /*
-        for (int j = 0; j < (FC.stat.st_size / FC.stat.st_blksize); j++) {
-          putFileSegment(BS, j * FC.stat.st_blksize, FC.stat.st_blksize);
-        }
-        putFileSegment(BS, FC.stat.st_size / FC.stat.st_blksize, FC.stat.st_size % FC.stat.st_blksize);
-        */
-
         lookUpByte(BS, P2);
-
-        destroy(BS);
-        free(BS);
+        ByteStream_reset(BS);
       }
 
+      destroy(BS);
+      free(BS);
+      break;
+
+    case 4:
+      printf("Performance test for write_0(normal mode) with:" \
+          "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
+          P1, P2, P3);
+
+      FC = FileChannel_0("../../files/perf_w.tmp", "w");
+      BS = ByteStream_0(P3);
+      fillByteStream(BS, P2);
+
+      for (int i = 0; i < P1; ++i) {
+        write_0(BS, FC);
+      }
+
+      destroy(BS);
+      free(BS);
       break;
 
     default:
       break;
   }
   printf("Finish\n");
-  fflush(stdout);
   return 0;
 }

@@ -143,12 +143,13 @@ ArithmeticCoderFLW *ArithmeticCoderFLW_3(int codewordLength,
 int prob0ToFLW(float prob0, int precisionBits) {
   assert((prob0 >= 0.f) && (prob0 <= 1.f));
 
-  int prob0FLW = ((float) (1 << precisionBits) * prob0);
+  int prob0FLW = ((1 << precisionBits) * prob0);
   if(prob0FLW == 0) {
     prob0FLW = 1;
   } else if(prob0FLW == (1 << precisionBits)) {
     prob0FLW = (1 << precisionBits) - 1;
   }
+
   assert((prob0FLW > 0) && (prob0FLW < (1 << precisionBits)));
   return(prob0FLW);
 }
@@ -184,7 +185,6 @@ void encodeBit(ArithmeticCoderFLW *object, int bit){
  * Decodes a bit without using any probability model.
  *
  * @return bit output
- * @throws Exception when some problem manipulating the stream occurs
  */
 int decodeBit(ArithmeticCoderFLW *object) {
   return(decodeBitProb(object, object->precisionMid));
@@ -238,7 +238,6 @@ void encodeBitContext(ArithmeticCoderFLW *object, int bit, int context) {
  *
  * @param context context of the symbols
  * @return output bit
- * @throws Exception when some problem manipulating the stream occurs
  */
 int decodeBitContext(ArithmeticCoderFLW *object, int context) {
 	//Updates the probability of this context, when necessary
@@ -302,7 +301,6 @@ void encodeBitProb(ArithmeticCoderFLW *object, int bit, int prob0FLW){
  *
  * @param prob0FLW probability of bit == false. This probability is generated via {@link #prob0ToFLW}
  * @return bit decoded bit
- * @throws Exception when some problem manipulating the stream occurs
  */
 int decodeBitProb(ArithmeticCoderFLW *object, int prob0FLW) {
   assert((prob0FLW > 0) && (prob0FLW < (1 << object->precisionBits)));
@@ -349,7 +347,6 @@ void encodeInteger(ArithmeticCoderFLW *object, int num, int numBits) {
  *
  * @param numBits number of bits decoded for that integer
  * @return output integer
- * @throws Exception when some problem manipulating the stream occurs
  */
 int decodeInteger(ArithmeticCoderFLW *object, int numBits) {
   int num = 0;
@@ -491,8 +488,6 @@ void restartDecoding(ArithmeticCoderFLW *object) {
 
 /**
  * Terminates the current stream using an optimal termination (for encoding purposes).
- *
- * @throws Exception when some problem manipulating the stream occurs
  */
 void terminate(ArithmeticCoderFLW *object) {
   long long interval1 = 0;

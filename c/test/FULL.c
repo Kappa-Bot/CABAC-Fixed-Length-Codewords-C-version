@@ -9,15 +9,15 @@
 
 // Message contains "ARITHMETIC"
 const signed char code_table[256] = {
-  // [0 ... 255] = 255,
-  ['A'] = 4,
-  ['R'] = 5,
-  ['I'] = 6,
-  ['T'] = 7,
-  ['H'] = 8,
-  ['M'] = 9,
-  ['E'] = 10,
-  ['C'] = 11,
+  [0 ... 255] = 255,
+  ['A'] = 0,
+  ['R'] = 1,
+  ['I'] = 2,
+  ['T'] = 3,
+  ['H'] = 4,
+  ['M'] = 5,
+  ['E'] = 6,
+  ['C'] = 7,
 };
 
 signed char lookupTable(int flw) {
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
    *  - precisionBits  ->  8
    *  - numContexts    ->  1
    */
-  ArithmeticCoderFLW *ACN = ArithmeticCoderFLW_3(4, 8, 1);
+  ArithmeticCoderFLW *ACN = ArithmeticCoderFLW_3(3, 8, 1);
 
   printf("Initializing ByteStream (normal mode)\n");
   /*
@@ -57,17 +57,17 @@ int main(int argc, char *argv[]) {
    * Encoding the Message
    *  A - R - I - T - H - M - E - T - I - C
    */
-  for (int i = 0; i < 10; ++i) {
-    encodeInteger(ACN, code_table['A'], 4);
-    encodeInteger(ACN, code_table['R'], 4);
-    encodeInteger(ACN, code_table['I'], 4);
-    encodeInteger(ACN, code_table['T'], 4);
-    encodeInteger(ACN, code_table['H'], 4);
-    encodeInteger(ACN, code_table['M'], 4);
-    encodeInteger(ACN, code_table['E'], 4);
-    encodeInteger(ACN, code_table['T'], 4);
-    encodeInteger(ACN, code_table['I'], 4);
-    encodeInteger(ACN, code_table['C'], 4);
+  for (int i = 0; i < 24; ++i) {
+    encodeInteger(ACN, code_table['A'], 3);
+    encodeInteger(ACN, code_table['R'], 3);
+    encodeInteger(ACN, code_table['I'], 3);
+    encodeInteger(ACN, code_table['T'], 3);
+    encodeInteger(ACN, code_table['H'], 3);
+    encodeInteger(ACN, code_table['M'], 3);
+    encodeInteger(ACN, code_table['E'], 3);
+    encodeInteger(ACN, code_table['T'], 3);
+    encodeInteger(ACN, code_table['I'], 3);
+    encodeInteger(ACN, code_table['C'], 3);
   }
 
   /* **************************************************** */
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
   signed char *aux = (signed char *) malloc(BSN->limit * sizeof(signed char));
   for (int i = 0; i < BSN->limit; ++i) {
     // Looks for a match in code_table[] for the 3-bits flw
-    aux[i] = lookupTable(decodeInteger(ACN, 4));
+    aux[i] = lookupTable(decodeInteger(ACN, 3));
   }
 
   // Should print ARITHMETIC
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
    *  - precisionBits  ->  8
    *  - numContexts    ->  1
    */
-  ArithmeticCoderFLW *ACR = ArithmeticCoderFLW_3(4, 8, 1);
+  ArithmeticCoderFLW *ACR = ArithmeticCoderFLW_3(3, 8, 1);
 
   // Using the previously coded stream written into the file
   FileChannel FCR = FileChannel_0("../../files/full_c.tmp", "r");
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   signed char *aux2 = (signed char *) malloc(BSR->limit * sizeof(signed char));
   for (int i = 0; i < BSR->limit; ++i) {
     // Looks for a match in code_table[] for the 3-bits flw
-    aux2[i] = lookupTable(decodeInteger(ACR, 4));
+    aux2[i] = lookupTable(decodeInteger(ACR, 3));
   }
 
   // Should print ARITHMETIC
