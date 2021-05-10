@@ -20,7 +20,7 @@ int main() {
   printf("FileChannel 2 |write| fc2.tmp receives\t|\t\'lorem ipsum\'\n");
   printf("%s\n", H1);
 
-  FileChannel FC1 = FileChannel_0(FILENAME1, "r");
+  FileChannel FC1 = FileChannel_0(FILENAME1, FC_READ);
 
   /* **************************************************** */
   printf("%41s\n", "fcSize Test");
@@ -94,7 +94,7 @@ int main() {
   /* **************************************************** */
   printf("%45s\n", "fcTransferFrom Test");
   printf("%s\n", H2);
-  FileChannel FC2 = FileChannel_0(FILENAME2, "w");
+  FileChannel FC2 = FileChannel_0(FILENAME2, FC_WRITE);
   printf("File size before: %lld\n", fcSize(&FC2));
   off_t transferPosition = (off_t) 0;
   long long written = fcTransferFrom(&FC2, &FC1, &transferPosition, size * 2);

@@ -362,7 +362,7 @@ public final class ByteStream{
 	public byte getByte(long index) throws Exception{
 		assert((streamMode == 0) || (streamMode == 1));
 
-		assert(index < 0 || index >= limit);
+		assert(index > 0 || index <= limit);
 
 		byte getByte = 0;
 		if(streamMode == 0){

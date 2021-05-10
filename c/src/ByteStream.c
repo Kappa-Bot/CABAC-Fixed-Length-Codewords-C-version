@@ -162,7 +162,7 @@ void putFileSegment(ByteStream *object, long long begin, long long length) {
   assert(object->streamMode == 1);
   assert(object->readFileChannel.file != NULL);
   assert((begin >= 0) && (length > 0));
-  assert(begin + length <= object->readFileChannel.stat.st_size);
+  assert(begin + length <= fcSize(&object->readFileChannel));
   assert(object->readFileNumSegments <= object->readFileSegments.length);
 
   if(object->readFileNumSegments == object->readFileSegments.length) {

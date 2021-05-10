@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   free(aux);
 
   // Writes the whole BSN->limit bytes into a file for next test
-  FileChannel FCN = FileChannel_0("../../files/full_c.tmp", "w");
+  FileChannel FCN = FileChannel_0("../../files/full_c.tmp", FC_WRITE);
   write_0(BSN, FCN);
   fcClose(&FCN);
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
   ArithmeticCoderFLW *ACR = ArithmeticCoderFLW_3(3, 8, 1);
 
   // Using the previously coded stream written into the file
-  FileChannel FCR = FileChannel_0("../../files/full_c.tmp", "r");
+  FileChannel FCR = FileChannel_0("../../files/full_c.tmp", FC_READ);
 
   printf("Initializing ByteStream (readFile mode)\n");
   /*

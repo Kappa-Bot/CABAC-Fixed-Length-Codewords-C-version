@@ -92,8 +92,8 @@ int main(int argc, char *argv[]) {
       FC = FileChannel_0("../../files/sg_0.tmp", "r");
       BS = ByteStream_2(FC);
 
-      for (int i = 0; i < FC.size() / 512; i++) {
-        BS.putFileSegment(i * 512, 512);
+      for (int i = 0; i < fcSize(&FC) / 512; i++) {
+        putFileSegment(BS, i * 512, 512);
       }
       changeStream(ACFLW, BS);
       restartDecoding(ACFLW);

@@ -164,12 +164,12 @@ int main() {
   ByteBuffer tmpBuff0 = {(signed char *) malloc(getLength(BS) / 2), getLength(BS) / 2};
 
   printf("Writing [0 - %lld] bytes into w1_0_c.tmp\n", getLength(BS) / 2);
-  FileChannel fcOut1_0 = FileChannel_0("../../files/w1_0_c.tmp", "w");
+  FileChannel fcOut1_0 = FileChannel_0("../../files/w1_0_c.tmp", FC_WRITE);
   write_1(BS, fcOut1_0, 0, getLength(BS) / 2);
   fcClose(&fcOut1_0);
 
   printf("Checking integrity -> w1_0_c.tmp\n");
-  FileChannel fcIn1_0 = FileChannel_0("../../files/w1_0_c.tmp", "r");
+  FileChannel fcIn1_0 = FileChannel_0("../../files/w1_0_c.tmp", FC_READ);
   fcRead(&fcIn1_0, tmpBuff0, 0);
   verifOut = 1;
   for (long long i = 0; i < getLength(BS) / 2 && verifOut; ++i) {
@@ -187,11 +187,11 @@ int main() {
   ByteBuffer tmpBuff2 = {(signed char *) malloc(getLength(BS)), getLength(BS)};
 
   printf("Writing everything into w0_c.tmp\n");
-  FileChannel fcOut0 = FileChannel_0("../../files/w0_c.tmp", "w");
+  FileChannel fcOut0 = FileChannel_0("../../files/w0_c.tmp", FC_WRITE);
   write_0(BS, fcOut0);
 
   printf("Checking integrity -> w0_c.tmp\n");
-  FileChannel fcIn0 = FileChannel_0("../../files/w0_c.tmp", "r");
+  FileChannel fcIn0 = FileChannel_0("../../files/w0_c.tmp", FC_READ);
   fcRead(&fcIn0, tmpBuff2, 0);
   verifOut = 1;
   for (long long i = 0; i < getLength(BS) && verifOut; ++i) {
@@ -207,7 +207,7 @@ int main() {
   printf("%s\n", H1);
   printf("Initializing ByteStream (readFile mode)\n");
 
-  FileChannel FC = FileChannel_0("../../files/w0_c.tmp", "r");
+  FileChannel FC = FileChannel_0("../../files/w0_c.tmp", FC_READ);
   ByteStream *BS2 = ByteStream_2(FC);
 
   printf("%s\n", H1);
@@ -280,8 +280,8 @@ int main() {
   saveToTemporalFile(BS2, "../../files/");
   printf("%s\n", H2);
   printf("Checking integrity -> w0_c.tmp vs %s\n", BS2->temporalFileName);
-  FileChannel fcInTmp0 = FileChannel_0("../../files/w0_c.tmp", "r");
-  FileChannel fcInTmp1 = FileChannel_0(BS2->temporalFileName, "r");
+  FileChannel fcInTmp0 = FileChannel_0("../../files/w0_c.tmp", FC_READ);
+  FileChannel fcInTmp1 = FileChannel_0(BS2->temporalFileName, FC_READ);
   ByteBuffer tmpBuffTmp0 = {(signed char *) malloc(fcSize(&fcInTmp0)), fcSize(&fcInTmp0)};
   ByteBuffer tmpBuffTmp1 = {(signed char *) malloc(fcSize(&fcInTmp1)), fcSize(&fcInTmp1)};
   fcRead(&fcInTmp0, tmpBuffTmp0, 0);
@@ -300,13 +300,13 @@ int main() {
   /* **************************************************** */
   printf("%36s\n", "write_0 (temporalFile mode) Test");
   printf("%s\n", H2);
-  FileChannel FCTMP = FileChannel_0("../../files/wt_c.tmp", "w");
+  FileChannel FCTMP = FileChannel_0("../../files/wt_c.tmp", FC_WRITE);
   write_0(BS2, FCTMP);
   fcClose(&FCTMP);
   printf("%s\n", H2);
   printf("Checking integrity -> wt_c.tmp vs %s\n", BS2->temporalFileName);
-  FileChannel fcInTmp2 = FileChannel_0("../../files/wt_c.tmp", "r");
-  FileChannel fcInTmp3 = FileChannel_0(BS2->temporalFileName, "r");
+  FileChannel fcInTmp2 = FileChannel_0("../../files/wt_c.tmp", FC_READ);
+  FileChannel fcInTmp3 = FileChannel_0(BS2->temporalFileName, FC_READ);
   ByteBuffer tmpBuffTmp2 = {(signed char *) malloc(fcSize(&fcInTmp3)), fcSize(&fcInTmp2)};
   ByteBuffer tmpBuffTmp3 = {(signed char *) malloc(fcSize(&fcInTmp2)), fcSize(&fcInTmp3)};
   fcRead(&fcInTmp2, tmpBuffTmp2, 0);

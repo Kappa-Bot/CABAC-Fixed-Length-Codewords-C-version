@@ -27,12 +27,11 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
 
-      FC1 = FileChannel_0(FILENAME_READ, "r");
+      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
       BB = (ByteBuffer) {(signed char *) malloc(P2 * sizeof(signed char)), P2};
 
       for (int i = 0; i < P1; ++i) {
         fcRead(&FC1, BB, 0);
-        memset(BB.array, 0, P2 * sizeof(signed char));
       }
 
       free(BB.array);
@@ -44,7 +43,7 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
 
-      FC1 = FileChannel_0(FILENAME_READ, "r");
+      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
       BB = (ByteBuffer) {(signed char *) malloc(P2 * sizeof(signed char)), P2};
 
       for (int i = 0; i < P1; ++i) {
@@ -63,7 +62,7 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
 
-      FC1 = FileChannel_0(FILENAME_READ, "r");
+      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
       BB = (ByteBuffer) {(signed char *) malloc(P2 * sizeof(signed char)), P2};
 
       for (int i = 0; i < P1; ++i) {
@@ -81,7 +80,7 @@ int main(int argc, char *argv[]) {
       printf("Performance test for fcSize() with:" \
           "\n\tRepetitions: %lld\n", P1);
 
-      FC1 = FileChannel_0(FILENAME_READ, "r");
+      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
 
       for (int i = 0; i < P1; ++i) {
         fcSize(&FC1);
@@ -96,7 +95,7 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
 
-      FC1 = FileChannel_0(FILENAME_READ, "r");
+      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
 
       for (int i = 0; i < P1; ++i) {
         for (long long j = 0; j < P2; ++j) {
@@ -111,7 +110,7 @@ int main(int argc, char *argv[]) {
       printf("Performance test for fcGetPosition() with:" \
           "\n\tRepetitions: %lld\n", P1);
 
-      FC1 = FileChannel_0(FILENAME_READ, "r");
+      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
 
       for (int i = 0; i < P1; ++i) {
         fcGetPosition(&FC1);
@@ -125,7 +124,7 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
 
-      FC2 = FileChannel_0(FILENAME_WRITE, "w");
+      FC2 = FileChannel_0(FILENAME_WRITE, FC_WRITE);
       BB = (ByteBuffer) {(signed char *) malloc(P2 * sizeof(signed char)), P2};
 
       for (int i = 0; i < P2; ++i) {
@@ -144,8 +143,8 @@ int main(int argc, char *argv[]) {
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
 
-      FC1 = FileChannel_0(FILENAME_READ, "r");
-      FC2 = FileChannel_0(FILENAME_WRITE, "w");
+      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
+      FC2 = FileChannel_0(FILENAME_WRITE, FC_WRITE);
       off_t transferPos = 0;
 
       for (int i = 0; i < P1; ++i) {
