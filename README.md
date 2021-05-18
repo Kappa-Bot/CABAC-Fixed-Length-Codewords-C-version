@@ -2,32 +2,40 @@
 This is a transcription from an implementation of an Arithmetic Coder from Java to C [[1]](#1).
 This work aims to get a version of the resources in C, keeping an enough-equivalent compression behaviour, attempting to obtain a significantly-improved performance for this system.
 
+At this point, almost all code work is done, the remaining task is to evaluate benchmarks and to implement some optimizations in the core code.
+
 ## Transcription
   - [X] ArithmeticCoderFLW
   - [X] ByteStream
   - [X] FileChannel
-  - [X] Structures (ByteBuffer, FileSegments)
+  - [X] Structures (ByteBuffer, FileSegments, ...)
 ## Software Testing
   - [X] Streams checker (C)
   - [X] Streams generator (Both versions, but C > Java)
   - [X] ArithmeticCoderFLW
-  - [X] ByteStream - normal
-  - [X] ByteStream - readFile
-  - [X] ByteStream - temporalFile
+  - [X] ByteStream: normal
+  - [X] ByteStream: readFile
+  - [X] ByteStream: temporalFile
+  - [X] ArithmeticCoderFLW + ByteStream: normal
+  - [X] ArithmeticCoderFLW + ByteStream: readFile <-> normal
+  - [X] ArithmeticCoderFLW + ByteStream: readfile <-> normal <-> temporalFile
   - [X] FileChannel
-  - [X] Full System coding/decoding correct
 ## Profiling (Raspberry Pi 4 8GB - Raspbian)
+### ArithmeticCoderFLW
   - [X] prob0ToFLW
   - [X] FLWToProb0
 ### ArithmeticCoderFLW + ByteStream (normal)
   - [X] encodeBit
   - [X] putByte
-  - [X] putBytes
   - [X] decodeBit
   - [X] getByte
-### ArithmeticCoderFLW + ByteStream (readFile)
+### ArithmeticCoderFLW + ByteStream (readFile = include FileChannel)
   - [X] decodeBit
   - [X] getByte
+  - [X] fcRead
+  - [X] fcRead1B
+  - [X] fcWrite
+  - [X] fcTransferFrom
 
 ## References
 <a id="1">[1]</a>

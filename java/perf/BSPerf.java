@@ -38,8 +38,9 @@ public class BSPerf {
   }
 
   public static void main(String []args) throws Exception {
+    long startTime = System.currentTimeMillis();
+
     ByteStream BS;
-    ByteBuffer BB;
     FileChannel FC;
 
     int OP = 0;
@@ -65,18 +66,6 @@ public class BSPerf {
         break;
 
       case 1:
-        System.out.printf("Performance test for putBytes_0() with:\n\tRepetitions: %d\n\tOperations:  %d\n\tAllocation:  %d\n", P1, P2, P3);
-
-        BS = new ByteStream(P3);
-        BB = ByteBuffer.allocate(P2);
-
-        for (int i = 0; i < P1; ++i) {
-          BS.putBytes(BB.array(), 0, P2);
-          BS.clear();
-        }
-        break;
-
-      case 2:
         System.out.printf("Performance test for getByte_0(normal mode) with:\n\tRepetitions: %d\n\tOperations:  %d\n\tAllocation:  %d\n", P1, P2, P3);
 
         BS = new ByteStream(P3);
@@ -88,15 +77,15 @@ public class BSPerf {
         }
         break;
 
-      case 3:
-        System.out.printf("Performance test for getByte_0(readFile mode) with:\n\tRepetitions: %d\n\tOperations:  %d\n\tAllocation:  %d\n", P1, P2, P3);
+      case 2:
+        System.out.printf("Performance test for getByte_0(readFile mode) with:\n\tRepetitions: %d\n\tOperations:  %d\n\tSegments:  %d\n", P1, P2, P3);
 
         FC = FileChannel.open(FileSystems.getDefault()
-          .getPath("../../files/w0_c.tmp"), StandardOpenOption.READ);
+          .getPath("../../files/sg_0.tmp"), StandardOpenOption.READ);
         BS = new ByteStream(FC);
 
-        for (int i = 0; i < FC.size() / 512; i++) {
-          BS.putFileSegment(i * 512, 512);
+        for (int i = 0; i < P3; i++) { // See C version
+          BS.putFileSegment(i * fcSize(&FC) / P3, fcSize(&FC) / P3);
         }
 
         for (int i = 0; i < P1; ++i) {
@@ -108,6 +97,11 @@ public class BSPerf {
       default:
         break;
     }
+
+    long endTime = System.currentTimeMillis();
+    long timeElapsed = endTime - startTime;
+    System.out.printf("Execution time in milliseconds: %d\n", timeElapsed);
+
     System.out.printf("Finish\n");
   }
 }

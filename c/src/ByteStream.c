@@ -243,9 +243,7 @@ signed char getByte_0(ByteStream *object) {
  */
 signed char getByte_1(ByteStream *object, long long index) {
   assert((object->streamMode == 0) || (object->streamMode == 1));
-  // Temporal code
   assert(index >= 0 && index <= object->limit);
-  // assert(index < 0 || index >= object->limit);
 
   signed char getByte = 0;
   if(object->streamMode == 0) {
@@ -258,6 +256,12 @@ signed char getByte_1(ByteStream *object, long long index) {
       accBytes += object->readFileSegments.array[segment][1];
       segment++;
     }
+    /*
+     * Optimization: faster way to search where the index lies
+    while (index >= object->readFileSegments.array[segment][0]) { segment++; }
+    long long fcPosition = index
+                - object->readFileSegments.array[segment][1])
+     */
     assert(segment < object->readFileNumSegments);
     //Determines the position in the file
     long long fcPosition = index - accBytes
@@ -265,7 +269,7 @@ signed char getByte_1(ByteStream *object, long long index) {
     assert(fcPosition < object->readFileChannel.stat.st_size);
 
     //Gets the byte
-    fcRead(&object->readFileChannel, object->temporalBuffer, fcPosition);
+    fcRead1B(&object->readFileChannel, object->temporalBuffer, fcPosition);
     getByte = object->temporalBuffer.array[0];
   }
   return(getByte);
@@ -417,6 +421,7 @@ void returnReadFileMode(ByteStream *object) {
   if(object->position >= object->limit) {
     object->position = object->limit -1;
   }
+
   object->streamMode = 1;
 }
 
@@ -542,7 +547,9 @@ void saveToTemporalFile(ByteStream *object, char *temporalDirectory) {
   omp_unset_lock(&object->lock);
   #endif
 
-  free(object->buffer.array);
+  if (object->buffer.array > 0) {
+    free(object->buffer.array);
+  }
   object->buffer.length = -1; // Useful for destroy()
 
   object->streamMode = 2;

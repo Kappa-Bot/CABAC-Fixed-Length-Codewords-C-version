@@ -37,6 +37,8 @@ public class ACPerf {
   }
 
   public static void main(String []args) throws Exception {
+    long startTime = System.currentTimeMillis();
+
     ArithmeticCoderFLW ACFLW;
     ByteStream BS;
     FileChannel FC;
@@ -61,6 +63,7 @@ public class ACPerf {
         for (int i = 0; i < P1; ++i) {
           fillArithmeticCoderFLW(ACFLW, P2);
           ACFLW.restartEncoding();
+          BS.reset();
         }
         break;
 
@@ -84,22 +87,23 @@ public class ACPerf {
 
         ACFLW = new ArithmeticCoderFLW(32, 15, 1);
         FC = FileChannel.open(FileSystems.getDefault()
-          .getPath("../../files/w0_c.tmp"), StandardOpenOption.READ);
+          .getPath("../files/sg_0.tmp"), StandardOpenOption.READ);
         BS = new ByteStream(FC);
 
-        for (int i = 0; i < FC.size() / 512; i++) {
-          BS.putFileSegment(i * 512, 512);
+        for (int i = 0; i < 4; i++) {
+          BS.putFileSegment(i * FC.size() / 4, FC.size() / 4);
         }
+
         ACFLW.changeStream(BS);
         ACFLW.restartDecoding();
 
         for (int i = 0; i < P1; ++i) {
-          lookUpByte(ACFLW, P1);
+          lookUpByte(ACFLW, P2);
           ACFLW.restartDecoding();
         }
         break;
 
-      case 4:
+      case 3:
         System.out.printf("Performance test for prob0ToFLW() with:\n\tRepetitions (factor 1 and 2): %d %d\n", P1, P2);
 
         ACFLW = new ArithmeticCoderFLW(32, 15, 1);
@@ -110,7 +114,7 @@ public class ACPerf {
         }
         break;
 
-      case 5:
+      case 4:
         System.out.printf("Performance test for FLWToProb0() with:\n\tRepetitions (factor 1 and 2): %d %d\n", P1, P2);
 
         ACFLW = new ArithmeticCoderFLW(32, 15, 1);
@@ -124,6 +128,11 @@ public class ACPerf {
       default:
         break;
     }
+
+    long endTime = System.currentTimeMillis();
+    long timeElapsed = endTime - startTime;
+    System.out.printf("Execution time in milliseconds: %d\n", timeElapsed);
+
     System.out.printf("Finish\n");
   }
 }

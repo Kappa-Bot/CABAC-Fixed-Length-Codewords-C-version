@@ -21,6 +21,8 @@ public class FCPerf {
   final static int pthr = java.lang.Thread.activeCount();
 
   public static void main(String []args) throws IOException {
+    long startTime = System.currentTimeMillis();
+
     FileChannel FC1, FC2; FileOutputStream FOS;
     ByteBuffer BB;
 
@@ -64,63 +66,7 @@ public class FCPerf {
         FC1.close();
         break;
 
-      case 2:
-        System.out.printf("Performance test for fcRead1B() (individual) with:\n\tRepetitions: %d\n\tOperations:  %d\n", P1, P2);
-
-        FC1 = FileChannel.open(FileSystems.getDefault()
-          .getPath(FILENAME_READ), StandardOpenOption.READ);
-        BB = ByteBuffer.allocate((int) P2);
-
-        for (int i = 0; i < P1; ++i) {
-          for (int j = 0; j < P2; ++j) {
-            FC1.read(BB, P2 / 2);
-          }
-        }
-
-        FC1.close();
-        break;
-
       case 3:
-        System.out.printf("Performance test for fcSize() with:\n\tRepetitions: %d\n", P1);
-
-        FC1 = FileChannel.open(FileSystems.getDefault()
-          .getPath(FILENAME_READ), StandardOpenOption.READ);
-
-        for (int i = 0; i < P1; ++i) {
-          FC1.size();
-        }
-
-        break;
-
-      case 4:
-        System.out.printf("Performance test for fcPosition() with:\n\tRepetitions: %d\n\tOperations:  %d\n", P1, P2);
-
-        FC1 = FileChannel.open(FileSystems.getDefault()
-          .getPath(FILENAME_READ), StandardOpenOption.READ);
-
-        for (int i = 0; i < P1; ++i) {
-          for (long j = 0; j < P2; ++j) {
-            FC1.position(j);
-          }
-        }
-
-        FC1.close();
-        break;
-
-      case 5:
-        System.out.printf("Performance test for fcGetPosition() with:\n\tRepetitions: %d\n", P1);
-
-        FC1 = FileChannel.open(FileSystems.getDefault()
-          .getPath(FILENAME_READ), StandardOpenOption.READ);
-
-        for (int i = 0; i < P1; ++i) {
-          FC1.position();
-        }
-
-        FC1.close();
-        break;
-
-      case 6:
         System.out.printf("Performance test for fcWrite() with:\n\tRepetitions: %d\n\tOperations:  %d\n", P1, P2);
 
         FOS = new FileOutputStream(FILENAME_WRITE);
@@ -138,7 +84,7 @@ public class FCPerf {
         FOS.close();
         break;
 
-      case 7:
+      case 4:
         System.out.printf("Performance test for fcTransferFrom() with:\n\tRepetitions: %d\n\tOperations:  %d\n", P1, P2);
 
         FC1 = FileChannel.open(FileSystems.getDefault()
@@ -157,6 +103,11 @@ public class FCPerf {
       default:
         break;
     }
+
+    long endTime = System.currentTimeMillis();
+    long timeElapsed = endTime - startTime;
+    System.out.printf("Execution time in milliseconds: %d\n", timeElapsed);
+
     System.out.printf("Finish\n");
   }
 }

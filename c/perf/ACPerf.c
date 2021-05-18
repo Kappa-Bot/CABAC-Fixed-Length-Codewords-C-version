@@ -6,7 +6,7 @@
 
 #define DEFAULT_P1 1000L
 #define DEFAULT_P2 1000000L
-#define DEFAULT_P3 ((long) INITIAL_ALLOCATION)
+#define DEFAULT_P3 ((long long) INITIAL_ALLOCATION)
 
 /*
  * Sequentially executes the function decodeBit repeteadly.
@@ -34,18 +34,18 @@ int main(int argc, char *argv[]) {
   FileChannel FC;
 
   int OP = 0;
-  if (argc > 1) OP = atol(argv[1]);
+  if (argc > 1) OP = atoll(argv[1]);
 
-  long P1 = DEFAULT_P1, P2 = DEFAULT_P2, P3 = DEFAULT_P3;
-  if (argc > 2) P1 = atol(argv[2]);
-  if (argc > 3) P2 = atol(argv[3]);
-  if (argc > 4) P3 = atol(argv[4]);
+  long long P1 = DEFAULT_P1, P2 = DEFAULT_P2, P3 = DEFAULT_P3;
+  if (argc > 2) P1 = atoll(argv[2]);
+  if (argc > 3) P2 = atoll(argv[3]);
+  if (argc > 4) P3 = atoll(argv[4]);
 
 
   switch (OP) {
     case 0:
       printf("Performance test for encodeBit() with:" \
-          "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
+          "\n\tRepetitions: %lld\n\tOperations:  %lld\n\tAllocation:  %lld\n",
           P1, P2, P3);
 
       ACFLW = ArithmeticCoderFLW_3(32, 15, 1);
@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < P1; ++i) {
         fillArithmeticCoderFLW(ACFLW, P2);
         restartEncoding(ACFLW);
+        ByteStream_reset(BS);
       }
 
       destroy(BS);
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
 
     case 1:
       printf("Performance test for decodeBit(normal mode) with:" \
-          "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
+          "\n\tRepetitions: %lld\n\tOperations:  %lld\n\tAllocation:  %lld\n",
           P1, P2, P3);
 
       ACFLW = ArithmeticCoderFLW_3(32, 15, 1);
@@ -76,6 +77,7 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < P1; ++i) {
         lookUpByte(ACFLW, P2);
         restartDecoding(ACFLW);
+        ByteStream_reset(BS);
       }
 
       destroy(BS);
@@ -85,7 +87,7 @@ int main(int argc, char *argv[]) {
 
     case 2:
       printf("Performance test for decodeBit(readFile mode) with:" \
-          "\n\tRepetitions: %ld\n\tOperations:  %ld\n\tAllocation:  %ld\n",
+          "\n\tRepetitions: %lld\n\tOperations:  %lld\n\tAllocation:  %lld\n",
           P1, P2, P3);
 
       ACFLW = ArithmeticCoderFLW_3(32, 15, 1);
@@ -99,17 +101,18 @@ int main(int argc, char *argv[]) {
       restartDecoding(ACFLW);
 
       for (int i = 0; i < P1; ++i) {
-        lookUpByte(ACFLW, P1);
+        lookUpByte(ACFLW, P2);
         restartDecoding(ACFLW);
+        ByteStream_reset(BS);
       }
       destroy(BS);
       free(BS);
       free(ACFLW);
       break;
 
-    case 4:
-    printf("Performance test for prob0ToFLW() with:" \
-        "\n\tRepetitions (factor 1 and 2): %ld %ld\n", P1, P2);
+    case 3:
+      printf("Performance test for prob0ToFLW() with:" \
+        "\n\tRepetitions (factor 1 and 2): %lld %lld\n", P1, P2);
 
       ACFLW = ArithmeticCoderFLW_3(32, 15, 1);
       for (long long i = 0; i < P1; ++i) {
@@ -120,9 +123,9 @@ int main(int argc, char *argv[]) {
       free(ACFLW);
       break;
 
-    case 5:
-    printf("Performance test for FLWToProb0() with:" \
-        "\n\tRepetitions (factor 1 and 2): %ld %ld\n", P1, P2);
+    case 4:
+      printf("Performance test for FLWToProb0() with:" \
+        "\n\tRepetitions (factor 1 and 2): %lld %lld\n", P1, P2);
 
       ACFLW = ArithmeticCoderFLW_3(32, 15, 1);
       for (long long i = 0; i < P1; ++i) {

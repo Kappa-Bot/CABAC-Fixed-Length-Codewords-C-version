@@ -50,7 +50,6 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < P2; ++j) {
           fcRead1B(&FC1, BB, j);
         }
-        memset(BB.array, 0, P2 * sizeof(signed char));
       }
 
       free(BB.array);
@@ -58,68 +57,6 @@ int main(int argc, char *argv[]) {
       break;
 
     case 2:
-      printf("Performance test for fcRead1B() (individual) with:" \
-          "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
-          P1, P2);
-
-      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
-      BB = (ByteBuffer) {(signed char *) malloc(P2 * sizeof(signed char)), P2};
-
-      for (int i = 0; i < P1; ++i) {
-        for (int j = 0; j < P2; ++j) {
-          fcRead1B(&FC1, BB, P2 / 2);
-        }
-        memset(BB.array, 0, P2 * sizeof(signed char));
-      }
-
-      free(BB.array);
-      fcClose(&FC1);
-      break;
-
-    case 3:
-      printf("Performance test for fcSize() with:" \
-          "\n\tRepetitions: %lld\n", P1);
-
-      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
-
-      for (int i = 0; i < P1; ++i) {
-        fcSize(&FC1);
-        fflush(FC1.file);
-      }
-
-      fcClose(&FC1);
-      break;
-
-    case 4:
-      printf("Performance test for fcPosition() with:" \
-          "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
-          P1, P2);
-
-      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
-
-      for (int i = 0; i < P1; ++i) {
-        for (long long j = 0; j < P2; ++j) {
-          fcPosition(&FC1, j);
-        }
-      }
-
-      fcClose(&FC1);
-      break;
-
-    case 5:
-      printf("Performance test for fcGetPosition() with:" \
-          "\n\tRepetitions: %lld\n", P1);
-
-      FC1 = FileChannel_0(FILENAME_READ, FC_READ);
-
-      for (int i = 0; i < P1; ++i) {
-        fcGetPosition(&FC1);
-      }
-
-      fcClose(&FC1);
-      break;
-
-    case 6:
       printf("Performance test for fcWrite() with:" \
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
@@ -138,7 +75,7 @@ int main(int argc, char *argv[]) {
       fcClose(&FC2);
       break;
 
-    case 7:
+    case 3:
       printf("Performance test for fcTransferFrom() with:" \
           "\n\tRepetitions: %lld\n\tOperations:  %lld\n",
           P1, P2);
