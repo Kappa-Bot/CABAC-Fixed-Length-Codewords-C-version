@@ -1,0 +1,23 @@
+Performance test for prob0ToFLW() with:
+	Repetitions (factor 1 and 2): 50000 10000
+Finish
+# started on Mon May 24 16:27:55 2021
+
+
+ Performance counter stats for './ACPerf.o 3 50000 10000 1024':
+
+           4184.22 msec task-clock                #    1.000 CPUs utilized          
+                 4      context-switches          #    0.001 K/sec                  
+        6259696584      cycles                    #    1.496 GHz                    
+       13506528647      instructions              #    2.16  insn per cycle         
+        1502548391      cache-references          #  359.099 M/sec                  
+             61542      cache-misses              #    0.004 % of all cache refs    
+        3501350420      branch                    #  836.800 M/sec                  
+             78817      branch-misses                                               
+
+       4.185337437 seconds time elapsed
+
+       4.181587000 seconds user
+       0.004001000 seconds sys
+
+

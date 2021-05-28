@@ -1,0 +1,24 @@
+Performance test for FLWToProb0() with:
+	Repetitions (factor 1 and 2): 50000 10000
+Execution time in milliseconds: 5031
+Finish
+# started on Mon May 24 16:31:53 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 4 50000 10000 1024':
+
+          10146.79 msec task-clock                #    1.006 CPUs utilized          
+              8306      context-switches          #    0.819 K/sec                  
+        8020778805      cycles                    #    0.790 GHz                    
+        7793561776      instructions              #    0.97  insn per cycle         
+        3415840337      cache-references          #  336.642 M/sec                  
+          81517901      cache-misses              #    2.386 % of all cache refs    
+        1721769667      branch                    #  169.686 M/sec                  
+          82095404      branch-misses                                               
+
+      10.088137636 seconds time elapsed
+
+       9.653338000 seconds user
+       0.643286000 seconds sys
+
+

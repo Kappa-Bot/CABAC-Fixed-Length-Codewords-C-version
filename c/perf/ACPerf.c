@@ -87,15 +87,15 @@ int main(int argc, char *argv[]) {
 
     case 2:
       printf("Performance test for decodeBit(readFile mode) with:" \
-          "\n\tRepetitions: %lld\n\tOperations:  %lld\n\tAllocation:  %lld\n",
+          "\n\tRepetitions: %lld\n\tOperations:  %lld\n\tSegments:  %lld\n",
           P1, P2, P3);
 
       ACFLW = ArithmeticCoderFLW_3(32, 15, 1);
       FC = FileChannel_0("../../files/sg_0.tmp", "r");
       BS = ByteStream_2(FC);
 
-      for (int i = 0; i < fcSize(&FC) / 512; i++) {
-        putFileSegment(BS, i * 512, 512);
+      for (int i = 0; i < P3; i++) {
+        putFileSegment(BS, i * fcSize(&FC) / P3, fcSize(&FC) / P3);
       }
       changeStream(ACFLW, BS);
       restartDecoding(ACFLW);

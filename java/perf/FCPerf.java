@@ -26,8 +26,6 @@ public class FCPerf {
     FileChannel FC1, FC2; FileOutputStream FOS;
     ByteBuffer BB;
 
-    System.out.printf("Numthreads: %d", Runtime.getRuntime().availableProcessors());
-
     int OP = 0;
     if (args.length > 0) OP = Integer.parseInt(args[0]);
 
@@ -66,7 +64,7 @@ public class FCPerf {
         FC1.close();
         break;
 
-      case 3:
+      case 2:
         System.out.printf("Performance test for fcWrite() with:\n\tRepetitions: %d\n\tOperations:  %d\n", P1, P2);
 
         FOS = new FileOutputStream(FILENAME_WRITE);
@@ -84,7 +82,7 @@ public class FCPerf {
         FOS.close();
         break;
 
-      case 4:
+      case 3:
         System.out.printf("Performance test for fcTransferFrom() with:\n\tRepetitions: %d\n\tOperations:  %d\n", P1, P2);
 
         FC1 = FileChannel.open(FileSystems.getDefault()

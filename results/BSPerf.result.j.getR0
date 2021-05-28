@@ -1,0 +1,78 @@
+Performance test for getByte_0(readFile mode) with:
+	Repetitions: 200
+	Operations:  10000
+	Segments:  1
+Execution time in milliseconds: 13765
+Finish
+# started on Mon May 24 16:32:46 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.BSPerf 2 200 10000 1':
+
+          19032.88 msec task-clock                #    1.004 CPUs utilized          
+             10000      context-switches          #    0.525 K/sec                  
+       19908747763      cycles                    #    1.046 GHz                    
+       16053261663      instructions              #    0.81  insn per cycle         
+        7077501118      cache-references          #  371.857 M/sec                  
+         132082094      cache-misses              #    1.866 % of all cache refs    
+        3429287888      branch                    #  180.177 M/sec                  
+         123291742      branch-misses                                               
+
+      18.948735465 seconds time elapsed
+
+      14.364967000 seconds user
+       4.846013000 seconds sys
+
+
+Performance test for getByte_0(readFile mode) with:
+	Repetitions: 1000
+	Operations:  2000
+	Segments:  1
+Execution time in milliseconds: 13579
+Finish
+# started on Mon May 24 16:33:05 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.BSPerf 2 1000 2000 1':
+
+          18863.38 msec task-clock                #    1.005 CPUs utilized          
+             10018      context-switches          #    0.531 K/sec                  
+       19765672400      cycles                    #    1.048 GHz                    
+       16056063106      instructions              #    0.81  insn per cycle         
+        7078085383      cache-references          #  375.229 M/sec                  
+         137772703      cache-misses              #    1.946 % of all cache refs    
+        3442335792      branch                    #  182.488 M/sec                  
+         113585104      branch-misses                                               
+
+      18.778585565 seconds time elapsed
+
+      14.110673000 seconds user
+       4.934506000 seconds sys
+
+
+Performance test for getByte_0(readFile mode) with:
+	Repetitions: 20000
+	Operations:  100
+	Segments:  1
+Execution time in milliseconds: 13310
+Finish
+# started on Mon May 24 16:33:23 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.BSPerf 2 20000 100 1':
+
+          18565.40 msec task-clock                #    1.004 CPUs utilized          
+             10035      context-switches          #    0.541 K/sec                  
+       19219342950      cycles                    #    1.035 GHz                    
+       16160137645      instructions              #    0.84  insn per cycle         
+        7198641104      cache-references          #  387.745 M/sec                  
+         137259452      cache-misses              #    1.907 % of all cache refs    
+        3528174007      branch                    #  190.040 M/sec                  
+         112977904      branch-misses                                               
+
+      18.484070576 seconds time elapsed
+
+      13.944856000 seconds user
+       4.798576000 seconds sys
+
+

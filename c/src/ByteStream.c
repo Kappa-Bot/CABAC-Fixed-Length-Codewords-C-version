@@ -22,7 +22,7 @@ struct BS_s BS_default = {                  // Default values for initial "insta
   0,                              // position
   {NULL},                         // readFileChannel
   -1,                             // readFileNumSegments
-  {NULL, 0},                      // readFileSegments
+  {NULL, NULL, 0},                      // readFileSegments
   -1,                             // temporalFilePosition
   NULL,                           // temporalFileName
   {NULL, 0}                       // temporalBuffer
@@ -71,14 +71,10 @@ ByteStream *ByteStream_2(FileChannel fc) {
   object->temporalBuffer.length = 1;
   object->readFileChannel = fc;
   object->readFileNumSegments = 0;
-  // object->readFileSegments.array = (long long **) malloc(INITIAL_NUM_SEGMENTS * 2 * sizeof(long long));
 
-  object->readFileSegments.array = (long long **) malloc(INITIAL_NUM_SEGMENTS * sizeof(long long *));
+  object->readFileSegments.begins = malloc(sizeof(long long[INITIAL_NUM_SEGMENTS]));
+  object->readFileSegments.lengths = malloc(sizeof(long long[INITIAL_NUM_SEGMENTS]));
   object->readFileSegments.length = INITIAL_NUM_SEGMENTS;
-  for (int i = 0; i < INITIAL_NUM_SEGMENTS; ++i) {
-    object->readFileSegments.array[i] = (long long *) malloc(2 * sizeof(long long));
-  }
-
 
   object->streamMode = 1;
   #ifdef _OPENMP
@@ -96,15 +92,8 @@ ByteStream *ByteStream_2(FileChannel fc) {
 void putByte(ByteStream *object, signed char b) {
   assert(object->streamMode == 0);
   if(object->limit == object->buffer.length) {
-    signed char *bufferTMP = (signed char *) malloc(object->buffer.length * 2);
-    memcpy(bufferTMP, object->buffer.array, object->limit);
-    free(object->buffer.array);
-    object->buffer.array = bufferTMP;
-
-    // Optimization: reduces memory paging and copying
-    // object->buffer.array = realloc(object->buffer.array, object->buffer.length * 2);
-
-    object->buffer.length = object->buffer.length * 2;
+    object->buffer.array = realloc(object->buffer.array, object->buffer.length * 2);
+    object->buffer.length *= 2;
   }
   object->buffer.array[object->limit] = b;
   object->limit++;
@@ -122,13 +111,7 @@ void putBytes_0(ByteStream *object, ByteBuffer array, int offset, int length) {
   assert(object->streamMode == 0);
   assert((offset >= 0) && (length > 0) && (offset + length <= array.length));
   if(object->limit + (long long) length > (long long) object->buffer.length) {
-    signed char *bufferTMP = (signed char*) malloc((object->buffer.length + length) * 2);
-    memcpy(bufferTMP, object->buffer.array, object->limit);
-    free(object->buffer.array);
-    object->buffer.array = bufferTMP;
-
-    // Optimization: reduces memory paging and cloning
-    // object->buffer.array = realloc(object->buffer.array, (object->buffer.length + length) * 2);
+    object->buffer.array = realloc(object->buffer.array, (object->buffer.length + length) * 2);
     object->buffer.length = (object->buffer.length + length) * 2;
   }
   memcpy(object->buffer.array + object->limit, array.array + offset, length);
@@ -167,6 +150,7 @@ void putFileSegment(ByteStream *object, long long begin, long long length) {
 
   if(object->readFileNumSegments == object->readFileSegments.length) {
 
+/*
     long long **fcSegmentsTMP = (long long **) malloc(object->readFileSegments.length * 2 * sizeof(long long *));
     for (int segment = 0; segment < object->readFileSegments.length * 2; ++segment) {
       fcSegmentsTMP[segment] = (long long *) malloc(2 * sizeof(long long));
@@ -176,15 +160,15 @@ void putFileSegment(ByteStream *object, long long begin, long long length) {
       fcSegmentsTMP[segment][0] = object->readFileSegments.array[segment][0];
       fcSegmentsTMP[segment][1] = object->readFileSegments.array[segment][1];
     }
-    //free(fcSegmentsTMP);
-
-    // Temporal code
-    free(object->readFileSegments.array);
     object->readFileSegments.array = fcSegmentsTMP;
-    object->readFileSegments.length = object->readFileSegments.length * 2;
+*/
+    // Temporal code
+    object->readFileSegments.begins = realloc(object->readFileSegments.begins, sizeof(long long[object->readFileSegments.length * 2]));
+    object->readFileSegments.lengths = realloc(object->readFileSegments.lengths, sizeof(long long[object->readFileSegments.length * 2]));
+    object->readFileSegments.length *= 2;
   }
-  object->readFileSegments.array[object->readFileNumSegments][0] = begin;
-  object->readFileSegments.array[object->readFileNumSegments][1] = length;
+  object->readFileSegments.begins[object->readFileNumSegments] = begin;
+  object->readFileSegments.lengths[object->readFileNumSegments] = length;
   object->readFileNumSegments++;
   object->limit += length;
 }
@@ -196,8 +180,6 @@ void putFileSegment(ByteStream *object, long long begin, long long length) {
 void removeByte(ByteStream *object) {
   assert(object->streamMode == 0);
   object->limit = (object->limit - 1 <= 0) ? 0: (object->limit - 1);
-  // object->limit = (object->limit - 1) * (object->limit > 1);
-  // object->position = object->position > object->limit ? object->limit : object->position;
   if(object->position > object->limit) {
     object->position = object->limit;
   }
@@ -212,8 +194,6 @@ void removeByte(ByteStream *object) {
 void removeBytes(ByteStream *object, int num) {
   assert(object->streamMode == 0);
   object->limit = (object->limit - num) <= 0 ? 0: (object->limit - num);
-  // object->limit = (object->limit - num) * ((object->limit - num) > 0);
-  // object->position = object->position > object->limit ? object->limit : object->position;
   if(object->position > object->limit) {
     object->position = object->limit;
   }
@@ -252,8 +232,8 @@ signed char getByte_1(ByteStream *object, long long index) {
     //Determines the segment in which this index lies
     int segment = 0;
     long long accBytes = 0;
-    while(index >= accBytes + object->readFileSegments.array[segment][1]) {
-      accBytes += object->readFileSegments.array[segment][1];
+    while(index >= accBytes + object->readFileSegments.lengths[segment]) {
+      accBytes += object->readFileSegments.lengths[segment];
       segment++;
     }
     /*
@@ -265,7 +245,7 @@ signed char getByte_1(ByteStream *object, long long index) {
     assert(segment < object->readFileNumSegments);
     //Determines the position in the file
     long long fcPosition = index - accBytes
-                + object->readFileSegments.array[segment][0];
+                + object->readFileSegments.begins[segment];
     assert(fcPosition < object->readFileChannel.stat.st_size);
 
     //Gets the byte
@@ -384,8 +364,8 @@ void endReadFileMode(ByteStream *object) {
   object->buffer.length = object->limit;
   int readBytes = 0;
   for(int segment = 0; segment < object->readFileNumSegments; segment++){
-    long long begin = object->readFileSegments.array[segment][0];
-    long long length = object->readFileSegments.array[segment][1];
+    long long begin = object->readFileSegments.begins[segment];
+    long long length = object->readFileSegments.lengths[segment];
 
     object->temporalBuffer.array = malloc(length);
     object->temporalBuffer.length = length;
@@ -409,14 +389,14 @@ void returnReadFileMode(ByteStream *object) {
   assert(object->streamMode == 0);
   assert(object->readFileChannel.file != NULL);
   assert(object->readFileNumSegments != -1);
-  assert(object->readFileSegments.array != NULL);
+  assert(object->readFileSegments.lengths != NULL);
 
   free(object->buffer.array);
   object->buffer.length = 0;
   object->limit = 0;
 
   for(int segment = 0; segment < object->readFileNumSegments; segment++) {
-    object->limit += object->readFileSegments.array[segment][1];
+    object->limit += object->readFileSegments.lengths[segment];
   }
   if(object->position >= object->limit) {
     object->position = object->limit -1;
@@ -431,14 +411,8 @@ void returnReadFileMode(ByteStream *object) {
  */
 void packetize(ByteStream *object) {
   assert(object->streamMode == 0);
-
-  signed char *bufferTMP = (signed char *) malloc(object->limit);
-  memcpy(bufferTMP, object->buffer.array, object->limit);
-  free(object->buffer.array);
-
-  // Optimization (cold-operation): reduces memory and paging operations
-  // object->buffer.array = realloc (object->buffer.array, object->limit);
-  object->buffer.array = bufferTMP;
+  // Optimization (cold-operation): reduces memory paging and cloning
+  object->buffer.array = realloc (object->buffer.array, object->limit);
   object->buffer.length = object->limit;
 }
 
@@ -583,12 +557,14 @@ void destroy(ByteStream *object) {
   if(object->buffer.length > 0) { // normal | (readFile + end() + ...)
     free(object->buffer.array);
   }
-  if(object->streamMode == 1) { // readFile
+  if(object->temporalBuffer.length > 0) { // normal | (readFile + end() + ...)
     free(object->temporalBuffer.array);
-    for(int i = 0; i < object->readFileSegments.length; ++i) {
-      free(object->readFileSegments.array[i]);
-    }
-    free(object->readFileSegments.array);
+  }
+  if(object->readFileSegments.length > 0) { // normal | (readFile + end() + ...)
+    free(object->readFileSegments.begins);
+    free(object->readFileSegments.lengths);
+  }
+  if(object->streamMode == 1) { // readFile
     fcClose(&object->readFileChannel);
   }
   #ifdef _OPENMP
@@ -604,7 +580,10 @@ void destroyTemporalFile(ByteStream *object) {
   if(object->temporalFileName != NULL) {
     int verif = remove(object->temporalFileName);
     assert(verif == 0);
-    if (verif == 0) object->temporalFileName = NULL;
+    if (verif == 0) {
+      free(object->temporalFileName);
+      object->temporalFileName = NULL;
+    }
   }
 }
 

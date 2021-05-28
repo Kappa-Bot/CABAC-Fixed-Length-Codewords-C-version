@@ -1,0 +1,26 @@
+Performance test for putByte() with:
+	Repetitions: 20000
+	Operations:  10000
+	Allocation:  1024
+Execution time in milliseconds: 5769
+Finish
+# started on Mon May 24 16:32:22 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.BSPerf 0 20000 10000 1024':
+
+          10989.74 msec task-clock                #    1.006 CPUs utilized          
+              8358      context-switches          #    0.761 K/sec                  
+        9035357845      cycles                    #    0.822 GHz                    
+        9909453929      instructions              #    1.10  insn per cycle         
+        4224481806      cache-references          #  384.402 M/sec                  
+          81788905      cache-misses              #    1.936 % of all cache refs    
+        2026511780      branch                    #  184.400 M/sec                  
+          81315166      branch-misses                                               
+
+      10.929051403 seconds time elapsed
+
+      10.398437000 seconds user
+       0.743900000 seconds sys
+
+

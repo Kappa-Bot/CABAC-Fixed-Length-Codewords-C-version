@@ -1,0 +1,25 @@
+Performance test for putByte() with:
+	Repetitions: 20000
+	Operations:  10000
+	Allocation:  1024
+Finish
+# started on Mon May 24 16:32:03 2021
+
+
+ Performance counter stats for './BSPerf.o 0 20000 10000 1024':
+
+           1480.99 msec task-clock                #    0.999 CPUs utilized          
+                22      context-switches          #    0.015 K/sec                  
+        2206130825      cycles                    #    1.490 GHz                    
+        4803410984      instructions              #    2.18  insn per cycle         
+        2401411857      cache-references          # 1621.493 M/sec                  
+             67307      cache-misses              #    0.003 % of all cache refs    
+        1000781163      branch                    #  675.752 M/sec                  
+             43564      branch-misses                                               
+
+       1.482524693 seconds time elapsed
+
+       1.478393000 seconds user
+       0.003995000 seconds sys
+
+

@@ -268,6 +268,9 @@ public final class ByteStream{
 				fcSegmentsTMP[segment][0] = readFileSegments[segment][0];
 				fcSegmentsTMP[segment][1] = readFileSegments[segment][1];
 			}
+
+			// Temporal code
+			readFileSegments = fcSegmentsTMP;
 		}
 
 		readFileSegments[readFileNumSegments][0] = begin;

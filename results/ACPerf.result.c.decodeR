@@ -1,0 +1,75 @@
+Performance test for decodeBit(readFile mode) with:
+	Repetitions: 100
+	Operations:  100000
+	Segments:  1
+Finish
+# started on Mon May 24 16:27:50 2021
+
+
+ Performance counter stats for './ACPerf.o 2 100 100000 1':
+
+           1792.29 msec task-clock                #    0.998 CPUs utilized          
+               177      context-switches          #    0.099 K/sec                  
+        2669327815      cycles                    #    1.489 GHz                    
+        3985407816      instructions              #    1.49  insn per cycle         
+        1781823044      cache-references          #  994.162 M/sec                  
+            141373      cache-misses              #    0.008 % of all cache refs    
+         943434310      branch                    #  526.386 M/sec                  
+          42653748      branch-misses                                               
+
+       1.795793651 seconds time elapsed
+
+       1.793658000 seconds user
+       0.000000000 seconds sys
+
+
+Performance test for decodeBit(readFile mode) with:
+	Repetitions: 1000
+	Operations:  10000
+	Segments:  1
+Finish
+# started on Mon May 24 16:27:51 2021
+
+
+ Performance counter stats for './ACPerf.o 2 1000 10000 1':
+
+           1788.76 msec task-clock                #    0.999 CPUs utilized          
+                28      context-switches          #    0.016 K/sec                  
+        2664079451      cycles                    #    1.489 GHz                    
+        3983107064      instructions              #    1.50  insn per cycle         
+        1780375642      cache-references          #  995.315 M/sec                  
+             80647      cache-misses              #    0.005 % of all cache refs    
+         943545870      branch                    #  527.487 M/sec                  
+          42619758      branch-misses                                               
+
+       1.790411920 seconds time elapsed
+
+       1.786050000 seconds user
+       0.003995000 seconds sys
+
+
+Performance test for decodeBit(readFile mode) with:
+	Repetitions: 100000
+	Operations:  100
+	Segments:  1
+Finish
+# started on Mon May 24 16:27:53 2021
+
+
+ Performance counter stats for './ACPerf.o 2 100000 100 1':
+
+           1609.02 msec task-clock                #    0.999 CPUs utilized          
+                 3      context-switches          #    0.002 K/sec                  
+        2395902612      cycles                    #    1.489 GHz                    
+        3989172036      instructions              #    1.66  insn per cycle         
+        1715012618      cache-references          # 1065.874 M/sec                  
+             37349      cache-misses              #    0.002 % of all cache refs    
+         929602224      branch                    #  577.745 M/sec                  
+          31993094      branch-misses                                               
+
+       1.610120518 seconds time elapsed
+
+       1.602344000 seconds user
+       0.007991000 seconds sys
+
+

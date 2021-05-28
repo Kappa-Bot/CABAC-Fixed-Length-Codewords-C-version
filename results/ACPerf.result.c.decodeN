@@ -1,0 +1,73 @@
+Performance test for decodeBit(normal mode) with:
+	Repetitions: 500
+	Operations:  100000
+	Allocation:  1024
+Finish
+# started on Mon May 24 16:27:33 2021
+
+
+ Performance counter stats for './ACPerf.o 1 500 100000 1024':
+
+           5483.33 msec task-clock                #    1.000 CPUs utilized
+                26      context-switches          #    0.005 K/sec
+        8204810672      cycles                    #    1.496 GHz
+       19626116325      instructions              #    2.39  insn per cycle
+        7484398261      cache-references          # 1364.937 M/sec
+            329715      cache-misses              #    0.004 % of all cache refs
+        4208741796      branch                    #  767.553 M/sec
+          21769415      branch-misses
+
+       5.485293137 seconds time elapsed
+
+       5.480585000 seconds user
+       0.003997000 seconds sys
+
+
+Performance test for decodeBit(normal mode) with:
+	Repetitions: 10000
+	Operations:  5000
+	Allocation:  1024
+Finish
+# started on Mon May 24 16:27:39 2021
+
+
+ Performance counter stats for './ACPerf.o 1 10000 5000 1024':
+
+           5469.92 msec task-clock                #    1.000 CPUs utilized
+                33      context-switches          #    0.006 K/sec
+        8185730225      cycles                    #    1.496 GHz
+       19593592463      instructions              #    2.39  insn per cycle
+        7473143705      cache-references          # 1366.225 M/sec
+             80477      cache-misses              #    0.001 % of all cache refs
+        4201501755      branch                    #  768.110 M/sec
+          21713090      branch-misses
+
+       5.471466299 seconds time elapsed
+
+       5.463308000 seconds user
+       0.007993000 seconds sys
+
+
+Performance test for decodeBit(normal mode) with:
+	Repetitions: 500000
+	Operations:  100
+	Allocation:  1024
+Finish
+# started on Mon May 24 16:27:44 2021
+
+
+ Performance counter stats for './ACPerf.o 1 500000 100 1024':
+
+           5448.98 msec task-clock                #    1.000 CPUs utilized
+                25      context-switches          #    0.005 K/sec
+        8154946784      cycles                    #    1.497 GHz
+       19571876515      instructions              #    2.40  insn per cycle
+        7463129071      cache-references          # 1369.639 M/sec
+             65559      cache-misses              #    0.001 % of all cache refs
+        4197982981      branch                    #  770.417 M/sec
+          20540186      branch-misses
+
+       5.450381566 seconds time elapsed
+
+       5.450298000 seconds user
+       0.000000000 seconds sys

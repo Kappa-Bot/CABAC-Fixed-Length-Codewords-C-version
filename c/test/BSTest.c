@@ -26,6 +26,7 @@ int main() {
     16
   };
   signed char *ptr = BS->buffer.array;
+  long long auxLen = BS->buffer.length;
   int verif;
 
   printf("%s\n", H1);
@@ -34,10 +35,11 @@ int main() {
 
   for (int i = 0; i < 10; i++) {
     ptr = BS->buffer.array;
+    auxLen = BS->buffer.length;
     verif = 1;
     while (verif) {
       putByte(BS, 1); // [0 - 255], overflow not allowed
-      verif = ptr == BS->buffer.array;
+      verif = auxLen == BS->buffer.length;
     }
     printf("old: %p\tnew: %p\tlength: %lld\n",
       ptr, BS->buffer.array, BS->buffer.length);
@@ -55,10 +57,11 @@ int main() {
   BS = ByteStream_0();
   for (int i = 0; i < 10; i++) {
     ptr = BS->buffer.array;
+    auxLen = BS->buffer.length;
     verif = 1;
     while (verif) {
       putBytes_0(BS, arr, 0, 16); // Whole array, sequences of [0-16]
-      verif = ptr == BS->buffer.array;
+      verif = auxLen == BS->buffer.length;
     }
     printf("old: %p\tnew: %p\tlength: %lld\n",
       ptr, BS->buffer.array, BS->buffer.length);
@@ -76,10 +79,11 @@ int main() {
   BS = ByteStream_0();
   for (int i = 0; i < 10; i++) {
     ptr = BS->buffer.array;
+    auxLen = BS->buffer.length;
     verif = 1;
     while (verif) {
       putBytes_1(BS, pack4B(1, 63, 127, 255), 4); // Max 4B value
-      verif = ptr == BS->buffer.array;
+      verif = auxLen == BS->buffer.length;
     }
     printf("old: %p\tnew: %p\tlength: %lld\n",
       ptr, BS->buffer.array, BS->buffer.length);
@@ -226,7 +230,7 @@ int main() {
   printf("%s\n", H2);
   for (int i = 0; i < 4; ++i) {
     printf("Segment %d\tGot: %lld, %-16lld\tExpected: %lld, %lld\n", i,
-        BS2->readFileSegments.array[i][0], BS2->readFileSegments.array[i][1],
+        BS2->readFileSegments.begins[i], BS2->readFileSegments.lengths[i],
         i * BS->limit / 4, BS->limit / 4);
   }
   printf("%s\n", H1);

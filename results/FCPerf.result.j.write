@@ -1,0 +1,75 @@
+Performance test for fcWrite() with:
+	Repetitions: 500
+	Operations:  100000
+Execution time in milliseconds: 8916
+Finish
+# started on Mon May 24 16:50:36 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.FCPerf 2 500 100000':
+
+           9835.85 msec task-clock                #    0.521 CPUs utilized          
+              8402      context-switches          #    0.854 K/sec                  
+        7289656187      cycles                    #    0.741 GHz                    
+        5491578772      instructions              #    0.75  insn per cycle         
+        2498974433      cache-references          #  254.068 M/sec                  
+          84062698      cache-misses              #    3.364 % of all cache refs    
+        1261006031      branch                    #  128.205 M/sec                  
+          82833430      branch-misses                                               
+
+      18.888395850 seconds time elapsed
+
+       9.091167000 seconds user
+       0.894943000 seconds sys
+
+
+Performance test for fcWrite() with:
+	Repetitions: 10000
+	Operations:  5000
+Execution time in milliseconds: 7779
+Finish
+# started on Mon May 24 16:50:55 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.FCPerf 2 10000 5000':
+
+           9941.53 msec task-clock                #    0.654 CPUs utilized          
+              8508      context-switches          #    0.856 K/sec                  
+        7402304290      cycles                    #    0.745 GHz                    
+        5561795751      instructions              #    0.75  insn per cycle         
+        2523235338      cache-references          #  253.808 M/sec                  
+          84186763      cache-misses              #    3.336 % of all cache refs    
+        1276055490      branch                    #  128.356 M/sec                  
+          81777822      branch-misses                                               
+
+      15.199228995 seconds time elapsed
+
+       9.096143000 seconds user
+       0.998060000 seconds sys
+
+
+Performance test for fcWrite() with:
+	Repetitions: 500000
+	Operations:  100
+Execution time in milliseconds: 12394
+Finish
+# started on Mon May 24 16:51:10 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.FCPerf 2 500000 100':
+
+          13487.94 msec task-clock                #    0.714 CPUs utilized          
+              8564      context-switches          #    0.635 K/sec                  
+       12658035056      cycles                    #    0.938 GHz                    
+        9194800799      instructions              #    0.73  insn per cycle         
+        3991761520      cache-references          #  295.950 M/sec                  
+         103300238      cache-misses              #    2.588 % of all cache refs    
+        2026573756      branch                    #  150.251 M/sec                  
+          95329007      branch-misses                                               
+
+      18.891224230 seconds time elapsed
+
+       9.681888000 seconds user
+       3.961321000 seconds sys
+
+

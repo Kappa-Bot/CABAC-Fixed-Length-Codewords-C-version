@@ -1,0 +1,25 @@
+Performance test for encodeBit() with:
+	Repetitions: 5000
+	Operations:  10000
+	Allocation:  1024
+Finish
+# started on Mon May 24 16:27:28 2021
+
+
+ Performance counter stats for './ACPerf.o 0 5000 10000 1024':
+
+           4966.16 msec task-clock                #    0.999 CPUs utilized          
+                38      context-switches          #    0.008 K/sec                  
+        7415001485      cycles                    #    1.493 GHz                    
+       17028441899      instructions              #    2.30  insn per cycle         
+        5945696696      cache-references          # 1197.243 M/sec                  
+           1538094      cache-misses              #    0.026 % of all cache refs    
+        3736371463      branch                    #  752.367 M/sec                  
+          21375665      branch-misses                                               
+
+       4.970092465 seconds time elapsed
+
+       4.915201000 seconds user
+       0.051991000 seconds sys
+
+

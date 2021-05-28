@@ -1,0 +1,76 @@
+Performance test for decodeBit(readFile mode) with:
+	Repetitions: 100
+	Operations:  100000
+	Allocation:  1
+Execution time in milliseconds: 44986
+Finish
+# started on Mon May 24 16:29:08 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 2 100 100000 1':
+
+          50285.10 msec task-clock                #    1.002 CPUs utilized
+             11074      context-switches          #    0.220 K/sec
+       66755083546      cycles                    #    1.328 GHz
+       60892732433      instructions              #    0.91  insn per cycle
+       26837359843      cache-references          #  533.704 M/sec
+         320610389      cache-misses              #    1.195 % of all cache refs
+       12758503907      branch                    #  253.723 M/sec
+         206331740      branch-misses
+
+      50.193470703 seconds time elapsed
+
+      31.426697000 seconds user
+      19.043808000 seconds sys
+
+
+Performance test for decodeBit(readFile mode) with:
+	Repetitions: 1000
+	Operations:  10000
+	Allocation:  1
+Execution time in milliseconds: 47846
+Finish
+# started on Mon May 24 16:29:58 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 2 1000 10000 1':
+
+          53121.39 msec task-clock                #    1.002 CPUs utilized
+             11370      context-switches          #    0.214 K/sec
+       71139693410      cycles                    #    1.339 GHz
+       60900773896      instructions              #    0.86  insn per cycle
+       26833004591      cache-references          #  505.126 M/sec
+         320078001      cache-misses              #    1.193 % of all cache refs
+       12686946889      branch                    #  238.829 M/sec
+         233769465      branch-misses
+
+      53.030940304 seconds time elapsed
+
+      32.880394000 seconds user
+      20.424423000 seconds sys
+
+
+Performance test for decodeBit(readFile mode) with:
+	Repetitions: 100000
+	Operations:  100
+	Allocation:  1
+Execution time in milliseconds: 46902
+Finish
+# started on Mon May 24 16:30:51 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 2 100000 100 1':
+
+          52219.78 msec task-clock                #    1.002 CPUs utilized
+             11328      context-switches          #    0.217 K/sec
+       69604646666      cycles                    #    1.333 GHz
+       60309305312      instructions              #    0.87  insn per cycle
+       26227825368      cache-references          #  502.258 M/sec
+         190825395      cache-misses              #    0.728 % of all cache refs
+       12553901609      branch                    #  240.405 M/sec
+         223562498      branch-misses
+
+      52.132308855 seconds time elapsed
+
+      31.614825000 seconds user
+      20.793212000 seconds sys

@@ -1,0 +1,25 @@
+Performance test for getByte_0(normal mode) with:
+	Repetitions: 20000
+	Operations:  10000
+	Allocation:  1024
+Finish
+# started on Mon May 24 16:32:05 2021
+
+
+ Performance counter stats for './BSPerf.o 1 20000 10000 1024':
+
+           1349.62 msec task-clock                #    0.999 CPUs utilized          
+                 4      context-switches          #    0.003 K/sec                  
+        2005678288      cycles                    #    1.486 GHz                    
+        5003837548      instructions              #    2.49  insn per cycle         
+        2201570849      cache-references          # 1631.247 M/sec                  
+             47702      cache-misses              #    0.002 % of all cache refs    
+        1400893247      branch                    # 1037.988 M/sec                  
+             41550      branch-misses                                               
+
+       1.350803072 seconds time elapsed
+
+       1.346985000 seconds user
+       0.003996000 seconds sys
+
+

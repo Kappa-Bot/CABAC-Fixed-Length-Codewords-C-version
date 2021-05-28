@@ -1,0 +1,78 @@
+Performance test for decodeBit(normal mode) with:
+	Repetitions: 500
+	Operations:  100000
+	Allocation:  1024
+Execution time in milliseconds: 11411
+Finish
+# started on Mon May 24 16:28:19 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 1 500 100000 1024':
+
+          16554.02 msec task-clock                #    1.004 CPUs utilized          
+              8650      context-switches          #    0.523 K/sec                  
+       17422626725      cycles                    #    1.052 GHz                    
+       32686546067      instructions              #    1.88  insn per cycle         
+       14049670840      cache-references          #  848.716 M/sec                  
+          83591262      cache-misses              #    0.595 % of all cache refs    
+        6428018008      branch                    #  388.305 M/sec                  
+          94907803      branch-misses                                               
+
+      16.496218031 seconds time elapsed
+
+      16.021131000 seconds user
+       0.687653000 seconds sys
+
+
+Performance test for decodeBit(normal mode) with:
+	Repetitions: 10000
+	Operations:  5000
+	Allocation:  1024
+Execution time in milliseconds: 11446
+Finish
+# started on Mon May 24 16:28:35 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 1 10000 5000 1024':
+
+          16652.32 msec task-clock                #    1.004 CPUs utilized          
+              8626      context-switches          #    0.518 K/sec                  
+       17369331089      cycles                    #    1.043 GHz                    
+       32627530289      instructions              #    1.88  insn per cycle         
+       14023529404      cache-references          #  842.137 M/sec                  
+          83637141      cache-misses              #    0.596 % of all cache refs    
+        6413609354      branch                    #  385.148 M/sec                  
+          94906376      branch-misses                                               
+
+      16.589424018 seconds time elapsed
+
+      16.101591000 seconds user
+       0.705856000 seconds sys
+
+
+Performance test for decodeBit(normal mode) with:
+	Repetitions: 500000
+	Operations:  100
+	Allocation:  1024
+Execution time in milliseconds: 10366
+Finish
+# started on Mon May 24 16:28:52 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 1 500000 100 1024':
+
+          15564.05 msec task-clock                #    1.004 CPUs utilized          
+              8608      context-switches          #    0.553 K/sec                  
+       15856571214      cycles                    #    1.019 GHz                    
+       27855859058      instructions              #    1.76  insn per cycle         
+       11065406487      cache-references          #  710.959 M/sec                  
+          82620786      cache-misses              #    0.747 % of all cache refs    
+        5678773544      branch                    #  364.865 M/sec                  
+          94371381      branch-misses                                               
+
+      15.508962844 seconds time elapsed
+
+      15.055560000 seconds user
+       0.660366000 seconds sys
+
+

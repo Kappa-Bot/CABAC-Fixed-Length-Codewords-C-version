@@ -16,12 +16,12 @@
 extern struct BS_s {
   int streamMode;                     // 0/1/2 <-> normal/readFile/temporalFile
   ByteBuffer buffer;                  // Array in which the bytes are stored
-  long long limit;                         // X != 0
-  long long position;                      // position <= limit
+  long long limit;                    // X != 0
+  long long position;                 // position <= limit
   FileChannel readFileChannel;        // Only for readFile mode
   int readFileNumSegments;            // 0 < X
   SegmentsArray readFileSegments;     // The indices are [segment][0- first byte, 1- length]
-  long long temporalFilePosition;          // Only for temporalFile mode
+  long long temporalFilePosition;     // Only for temporalFile mode
   char *temporalFileName;             // File name in which the stream is saved temporarily
   ByteBuffer temporalBuffer;          // Only for readFile mode
   #ifdef _OPENMP
@@ -35,34 +35,36 @@ extern struct BS_s {
  */
 typedef struct BS_s ByteStream;
 
+extern ByteStream *ByteStreamInit();
 
-extern ByteStream *ByteStreamInit();                               // No test needed
+extern ByteStream *ByteStream_0();
+extern ByteStream *ByteStream_1(int initialAllocation);
+extern ByteStream *ByteStream_2(FileChannel fc);
 
-extern ByteStream *ByteStream_0();                                 // No test needed
-extern ByteStream *ByteStream_1(int initialAllocation);            // No test needed
-extern ByteStream *ByteStream_2(FileChannel fc);                   // No test needed
-
-extern void putByte(ByteStream *object, signed char b);          // Tested
-extern void putBytes_0(ByteStream *object, ByteBuffer array,       // Tested
+extern void putByte(ByteStream *object, signed char b);
+extern void putBytes_0(ByteStream *object, ByteBuffer array,
                 int offset, int length);
-extern void putBytes_1(ByteStream *object, int num, int numBytes); // Tested
+extern void putBytes_1(ByteStream *object, int num, int numBytes);
 
 extern void putFileSegment(ByteStream *object, long long begin, long long length);
 
-extern void removeByte(ByteStream *object);                        // No test needed
-extern void removeBytes(ByteStream *object, int num);              // No test needed
+extern void removeByte(ByteStream *object);
+extern void removeBytes(ByteStream *object, int num);
 
 extern signed char getByte_0(ByteStream *object);
 extern signed char getByte_1(ByteStream *object, long long index);
+
+extern signed char getByte_2(ByteStream *object, long long index);
+
 extern int getBytes(ByteStream *object, int numBytes);
 
-extern int hasMoreBytes(ByteStream *object);                       // No test needed
-extern ByteBuffer getByteStream(ByteStream *object);               // No test needed
-extern long long getLength(ByteStream *object);                         // No test needed
-extern long long getPosition(ByteStream *object);                       // No test needed
+extern int hasMoreBytes(ByteStream *object);
+extern ByteBuffer getByteStream(ByteStream *object);
+extern long long getLength(ByteStream *object);
+extern long long getPosition(ByteStream *object);
 
-extern void clear(ByteStream *object);                             // No test needed
-extern void ByteStream_reset(ByteStream *object);                  // No test needed
+extern void clear(ByteStream *object);
+extern void ByteStream_reset(ByteStream *object);
 extern void skip(ByteStream *object, long long numBytes);
 
 extern void endReadFileMode(ByteStream *object);
@@ -70,11 +72,11 @@ extern void returnReadFileMode(ByteStream *object);
 
 extern void packetize(ByteStream *object);
 
-extern int isInReadNormalMode(ByteStream *object);                 // No test needed
-extern int isInReadFileMode(ByteStream *object);                   // No test needed
-extern int isInTemporalFile(ByteStream *object);                   // No test needed
+extern int isInReadNormalMode(ByteStream *object);
+extern int isInReadFileMode(ByteStream *object);
+extern int isInTemporalFile(ByteStream *object);
 
-extern void write_0(ByteStream *object, FileChannel fc); // Need to implement FileOutputStream
+extern void write_0(ByteStream *object, FileChannel fc);
 extern void write_1(ByteStream *object, FileChannel fc, long long begin, long long length);
 
 extern void saveToTemporalFile(ByteStream *object, char *temporalDirectory);

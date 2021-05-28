@@ -1,0 +1,26 @@
+Performance test for encodeBit() with:
+	Repetitions: 5000
+	Operations:  10000
+	Allocation:  1024
+Execution time in milliseconds: 11337
+Finish
+# started on Mon May 24 16:28:02 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 0 5000 10000 1024':
+
+          16616.51 msec task-clock                #    1.008 CPUs utilized          
+              8935      context-switches          #    0.538 K/sec                  
+       17478900658      cycles                    #    1.052 GHz                    
+       31190863195      instructions              #    1.78  insn per cycle         
+       13473566603      cache-references          #  810.854 M/sec                  
+          85730721      cache-misses              #    0.636 % of all cache refs    
+        6268095667      branch                    #  377.221 M/sec                  
+          95248210      branch-misses                                               
+
+      16.481702095 seconds time elapsed
+
+      15.866169000 seconds user
+       0.910552000 seconds sys
+
+

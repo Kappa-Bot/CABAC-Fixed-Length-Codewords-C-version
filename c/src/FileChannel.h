@@ -7,7 +7,8 @@
 #include <sys/stat.h>
 
 struct SA_s {
-  long long **array;
+  long long *begins;
+  long long *lengths;
   int length;
 };
 typedef struct SA_s SegmentsArray;

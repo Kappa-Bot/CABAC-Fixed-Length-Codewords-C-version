@@ -1,0 +1,75 @@
+Performance test for getByte_0(readFile mode) with:
+	Repetitions: 200
+	Operations:  1000000
+	Segments:  1
+Finish
+# started on Mon May 24 16:32:06 2021
+
+
+ Performance counter stats for './BSPerf.o 2 200 1000000 1':
+
+           2691.26 msec task-clock                #    0.999 CPUs utilized          
+                14      context-switches          #    0.005 K/sec                  
+        4018017361      cycles                    #    1.493 GHz                    
+       10804901831      instructions              #    2.69  insn per cycle         
+        4401928131      cache-references          # 1635.641 M/sec                  
+            330547      cache-misses              #    0.008 % of all cache refs    
+        2801016675      branch                    # 1040.784 M/sec                  
+             27969      branch-misses                                               
+
+       2.692848563 seconds time elapsed
+
+       2.684526000 seconds user
+       0.007989000 seconds sys
+
+
+Performance test for getByte_0(readFile mode) with:
+	Repetitions: 10000
+	Operations:  20000
+	Segments:  1
+Finish
+# started on Mon May 24 16:32:09 2021
+
+
+ Performance counter stats for './BSPerf.o 2 10000 20000 1':
+
+           2684.76 msec task-clock                #    1.000 CPUs utilized          
+                10      context-switches          #    0.004 K/sec                  
+        4008054542      cycles                    #    1.493 GHz                    
+       10805216442      instructions              #    2.70  insn per cycle         
+        4402083332      cache-references          # 1639.656 M/sec                  
+            131721      cache-misses              #    0.003 % of all cache refs    
+        2801126460      branch                    # 1043.343 M/sec                  
+             36511      branch-misses                                               
+
+       2.685969591 seconds time elapsed
+
+       2.686044000 seconds user
+       0.000000000 seconds sys
+
+
+Performance test for getByte_0(readFile mode) with:
+	Repetitions: 2000000
+	Operations:  100
+	Segments:  1
+Finish
+# started on Mon May 24 16:32:12 2021
+
+
+ Performance counter stats for './BSPerf.o 2 2000000 100 1':
+
+           2745.05 msec task-clock                #    1.000 CPUs utilized          
+                 5      context-switches          #    0.002 K/sec                  
+        4098764677      cycles                    #    1.493 GHz                    
+       10928630427      instructions              #    2.67  insn per cycle         
+        4453813177      cache-references          # 1622.487 M/sec                  
+             41432      cache-misses              #    0.001 % of all cache refs    
+        2836943159      branch                    # 1033.475 M/sec                  
+           2026154      branch-misses                                               
+
+       2.746187461 seconds time elapsed
+
+       2.742388000 seconds user
+       0.003997000 seconds sys
+
+

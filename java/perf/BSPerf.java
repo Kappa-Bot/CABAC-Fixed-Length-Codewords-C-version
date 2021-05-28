@@ -44,12 +44,12 @@ public class BSPerf {
     FileChannel FC;
 
     int OP = 0;
-    if (args.length > 1) OP = Integer.parseInt(args[0]);
+    if (args.length > 0) OP = Integer.parseInt(args[0]);
 
     int P1 = DEFAULT_P1, P2 = DEFAULT_P2, P3 = DEFAULT_P3;
-    if (args.length > 2) P1 = Integer.parseInt(args[1]);
-    if (args.length > 3) P2 = Integer.parseInt(args[2]);
-    if (args.length > 4) P3 = Integer.parseInt(args[3]);
+    if (args.length > 1) P1 = Integer.parseInt(args[1]);
+    if (args.length > 2) P2 = Integer.parseInt(args[2]);
+    if (args.length > 3) P3 = Integer.parseInt(args[3]);
 
     switch (OP) {
       case 0:
@@ -81,11 +81,11 @@ public class BSPerf {
         System.out.printf("Performance test for getByte_0(readFile mode) with:\n\tRepetitions: %d\n\tOperations:  %d\n\tSegments:  %d\n", P1, P2, P3);
 
         FC = FileChannel.open(FileSystems.getDefault()
-          .getPath("../../files/sg_0.tmp"), StandardOpenOption.READ);
+          .getPath("../files/sg_0.tmp"), StandardOpenOption.READ);
         BS = new ByteStream(FC);
 
         for (int i = 0; i < P3; i++) { // See C version
-          BS.putFileSegment(i * fcSize(&FC) / P3, fcSize(&FC) / P3);
+          BS.putFileSegment(i * FC.size() / P3, FC.size() / P3);
         }
 
         for (int i = 0; i < P1; ++i) {

@@ -1,0 +1,24 @@
+Performance test for prob0ToFLW() with:
+	Repetitions (factor 1 and 2): 50000 10000
+Execution time in milliseconds: 5024
+Finish
+# started on Mon May 24 16:31:43 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.ACPerf 3 50000 10000 1024':
+
+          10203.43 msec task-clock                #    1.006 CPUs utilized          
+              8261      context-switches          #    0.810 K/sec                  
+        7990563200      cycles                    #    0.783 GHz                    
+        7796466916      instructions              #    0.98  insn per cycle         
+        3417564270      cache-references          #  334.943 M/sec                  
+          81754424      cache-misses              #    2.392 % of all cache refs    
+        1723747708      branch                    #  168.938 M/sec                  
+          80862579      branch-misses                                               
+
+      10.140856963 seconds time elapsed
+
+       9.735809000 seconds user
+       0.620141000 seconds sys
+
+

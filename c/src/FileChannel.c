@@ -104,7 +104,7 @@ long long fcTransferFrom(FileChannel *object, FileChannel *src, off_t *position,
  * returns: number of bytes read = min length between the file and ByteBuffer src
  */
 long long fcRead(FileChannel *object, ByteBuffer src, off_t position) {
-  long long limit = src.length >= object->stat.st_size ? object->stat.st_size : src.length;
+  long long limit = src.length > (object->stat.st_size - position) ? (object->stat.st_size - position) : src.length;
   memcpy(src.array, object->buffer + position, limit);
   return limit;
 }

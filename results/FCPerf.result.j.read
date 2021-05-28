@@ -1,0 +1,75 @@
+Performance test for fcRead() with:
+	Repetitions: 1000
+	Operations:  1000000
+Execution time in milliseconds: 5474
+Finish
+# started on Mon May 24 16:37:53 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.FCPerf 0 1000 1000000':
+
+          10800.51 msec task-clock                #    1.006 CPUs utilized          
+              9487      context-switches          #    0.878 K/sec                  
+        7722664210      cycles                    #    0.715 GHz                    
+        5817561416      instructions              #    0.75  insn per cycle         
+        2665351361      cache-references          #  246.780 M/sec                  
+          90226703      cache-misses              #    3.385 % of all cache refs    
+        1346049061      branch                    #  124.628 M/sec                  
+          91188823      branch-misses                                               
+
+      10.740715027 seconds time elapsed
+
+      10.162369000 seconds user
+       0.808462000 seconds sys
+
+
+Performance test for fcRead() with:
+	Repetitions: 100000
+	Operations:  10000
+Execution time in milliseconds: 5712
+Finish
+# started on Mon May 24 16:38:04 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.FCPerf 0 100000 10000':
+
+          11050.03 msec task-clock                #    1.006 CPUs utilized          
+              9562      context-switches          #    0.865 K/sec                  
+        8020150657      cycles                    #    0.726 GHz                    
+        6074666838      instructions              #    0.76  insn per cycle         
+        2779456098      cache-references          #  251.534 M/sec                  
+          92504237      cache-misses              #    3.328 % of all cache refs    
+        1402665001      branch                    #  126.938 M/sec                  
+          94998905      branch-misses                                               
+
+      10.983529592 seconds time elapsed
+
+      10.469972000 seconds user
+       0.757695000 seconds sys
+
+
+Performance test for fcRead() with:
+	Repetitions: 1000000
+	Operations:  1000
+Execution time in milliseconds: 5971
+Finish
+# started on Mon May 24 16:38:15 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.FCPerf 0 1000000 1000':
+
+          11338.03 msec task-clock                #    1.005 CPUs utilized          
+              9752      context-switches          #    0.860 K/sec                  
+        8669869060      cycles                    #    0.765 GHz                    
+        6973527196      instructions              #    0.80  insn per cycle         
+        3158562906      cache-references          #  278.581 M/sec                  
+          95068571      cache-misses              #    3.010 % of all cache refs    
+        1591805291      branch                    #  140.395 M/sec                  
+          94481013      branch-misses                                               
+
+      11.276566056 seconds time elapsed
+
+      10.659506000 seconds user
+       0.850492000 seconds sys
+
+

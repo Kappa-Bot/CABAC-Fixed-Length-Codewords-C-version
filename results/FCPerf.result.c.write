@@ -1,0 +1,72 @@
+Performance test for fcWrite() with:
+	Repetitions: 500
+	Operations:  1000000
+Finish
+# started on Mon May 24 16:33:55 2021
+
+
+ Performance counter stats for './FCPerf.o 2 500 1000000':
+
+           2057.43 msec task-clock                #    0.056 CPUs utilized          
+              1003      context-switches          #    0.488 K/sec                  
+        2718690209      cycles                    #    1.321 GHz                    
+        1677932688      instructions              #    0.62  insn per cycle         
+         644605398      cache-references          #  313.306 M/sec                  
+          14904094      cache-misses              #    2.312 % of all cache refs    
+         334323702      branch                    #  162.496 M/sec                  
+           4499983      branch-misses                                               
+
+      37.066738455 seconds time elapsed
+
+       0.000000000 seconds user
+       2.054016000 seconds sys
+
+
+Performance test for fcWrite() with:
+	Repetitions: 10000
+	Operations:  50000
+Finish
+# started on Mon May 24 16:34:32 2021
+
+
+ Performance counter stats for './FCPerf.o 2 10000 50000':
+
+           2238.11 msec task-clock                #    0.058 CPUs utilized          
+              1181      context-switches          #    0.528 K/sec                  
+        2992923352      cycles                    #    1.337 GHz                    
+        2105907167      instructions              #    0.70  insn per cycle         
+         792252133      cache-references          #  353.983 M/sec                  
+          17487767      cache-misses              #    2.207 % of all cache refs    
+         423188272      branch                    #  189.083 M/sec                  
+           5192737      branch-misses                                               
+
+      38.897056321 seconds time elapsed
+
+       0.003983000 seconds user
+       2.226694000 seconds sys
+
+
+Performance test for fcWrite() with:
+	Repetitions: 5000000
+	Operations:  100
+Finish
+# started on Mon May 24 16:35:11 2021
+
+
+ Performance counter stats for './FCPerf.o 2 5000000 100':
+
+          27878.16 msec task-clock                #    0.188 CPUs utilized          
+              3273      context-switches          #    0.117 K/sec                  
+       41584069788      cycles                    #    1.492 GHz                    
+       31943569856      instructions              #    0.77  insn per cycle         
+       12564727325      cache-references          #  450.702 M/sec                  
+          64266086      cache-misses              #    0.511 % of all cache refs    
+        6501042640      branch                    #  233.195 M/sec                  
+          95999326      branch-misses                                               
+
+     148.325302956 seconds time elapsed
+
+       1.175450000 seconds user
+      26.719518000 seconds sys
+
+

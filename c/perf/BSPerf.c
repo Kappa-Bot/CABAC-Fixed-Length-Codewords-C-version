@@ -97,7 +97,33 @@ int main(int argc, char *argv[]) {
       destroy(BS);
       free(BS);
       break;
+/*
+    // Just get_Byte_1(readFile) but using FileChannel.read() instead of FileChannel.read1B()
+    case 3:
+      printf("Performance test for getByte_0(readFile mode - old) with:" \
+          "\n\tRepetitions: %lld\n\tOperations:  %lld\n\tSegments:  %lld\n",
+          P1, P2, P3);
 
+      FC = FileChannel_0("../../files/sg_0.tmp", "r");
+      BS = ByteStream_2(FC);
+
+      for (int i = 0; i < P3; i++) { // Multiple segments may be better on multithreading
+        putFileSegment(BS, i * fcSize(&FC) / P3, fcSize(&FC) / P3);
+      }
+
+      for (int i = 0; i < P1; ++i) {
+        for (int j = 0; j < P2; ++j) {
+          getByte_2(BS, j);
+        }
+        getByte_2(BS, P2);
+
+        ByteStream_reset(BS);
+      }
+
+      destroy(BS);
+      free(BS);
+      break;
+*/
     default:
       break;
   }

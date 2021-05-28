@@ -1,0 +1,26 @@
+Performance test for getByte_0(normal mode) with:
+	Repetitions: 20000
+	Operations:  10000
+	Allocation:  1024
+Execution time in milliseconds: 7177
+Finish
+# started on Mon May 24 16:32:33 2021
+
+
+ Performance counter stats for 'java -Xcomp -ea perf.BSPerf 1 20000 10000 1024':
+
+          12378.42 msec task-clock                #    1.005 CPUs utilized          
+              8335      context-switches          #    0.673 K/sec                  
+       11213622411      cycles                    #    0.906 GHz                    
+       15702829971      instructions              #    1.40  insn per cycle         
+        7620034669      cache-references          #  615.590 M/sec                  
+          82708478      cache-misses              #    1.085 % of all cache refs    
+        3423958715      branch                    #  276.607 M/sec                  
+          81105354      branch-misses                                               
+
+      12.314572051 seconds time elapsed
+
+      11.792430000 seconds user
+       0.739299000 seconds sys
+
+
